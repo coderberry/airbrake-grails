@@ -1,6 +1,6 @@
 package grails.plugins.airbrake
 
-import org.apache.log4j.spi.*;
+import org.apache.log4j.spi.*
 
 class ThrowableSupplementer implements NoticeSupplementer {
 	Notice supplement(Notice notice, LoggingEvent event) {

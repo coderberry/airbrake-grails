@@ -1,10 +1,10 @@
 package grails.plugins.airbrake
 
-import org.apache.log4j.*;
-import org.apache.log4j.spi.*;
+import org.apache.log4j.*
+import org.apache.log4j.spi.*
 
 class AirbrakeAppender extends AppenderSkeleton {
-	
+
 	protected final AirbrakeNotifier notifier = new AirbrakeNotifier()
 
 	protected final List<NoticeSupplementer> supplementers = new LinkedList<NoticeSupplementer>()
@@ -13,7 +13,7 @@ class AirbrakeAppender extends AppenderSkeleton {
 
 	protected final List<VarFilter> varFilters = new LinkedList<VarFilter>()
 
-	public AirbrakeAppender() {
+	AirbrakeAppender() {
 		setThreshold(Level.ERROR)
 
 		addSupplementer(new ThrowableSupplementer())
@@ -64,11 +64,10 @@ class AirbrakeAppender extends AppenderSkeleton {
 	}
 
 	@Override
-	public void close() {}
+	void close() {}
 
 	@Override
-	public boolean requiresLayout() {
-		return false;
+	boolean requiresLayout() {
+		return false
 	}
-
 }

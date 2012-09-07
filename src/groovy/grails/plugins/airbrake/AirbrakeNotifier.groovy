@@ -1,7 +1,7 @@
 package grails.plugins.airbrake
 
-import org.apache.log4j.*;
-import org.apache.log4j.spi.*;
+import org.apache.log4j.*
+import org.apache.log4j.spi.*
 
 class AirbrakeNotifier {
 
@@ -17,19 +17,19 @@ class AirbrakeNotifier {
 	String env
 
 	String host = AIRBRAKE_HOST
-	String port = null
+	String port
 	String path = AIRBRAKE_PATH
 	boolean secure = false
 
-	NoticeSerializer serializer = new GroovyNoticeSerializer();
+	NoticeSerializer serializer = new GroovyNoticeSerializer()
 
 	void notify(Notice notice) {
-        HttpURLConnection conn = null;
-        int responseCode;
-        String responseMessage;
+        HttpURLConnection conn
+        int responseCode
+        String responseMessage
 
         try {
-            conn = buildConnection();
+            conn = buildConnection()
 
             serializer.serialize(this, notice, new OutputStreamWriter(conn.outputStream))
 
@@ -37,13 +37,13 @@ class AirbrakeNotifier {
             responseMessage = conn.responseMessage
         } finally {
             if (conn != null)
-                conn.disconnect();
+                conn.disconnect()
         }
 
         if (responseCode < 200 || responseCode >= 300)
-            System.err.println("${responseCode}: ${responseMessage}, ${notice}");
+            System.err.println("${responseCode}: ${responseMessage}, ${notice}")
 
-        return;
+        return
 	}
 
     private HttpURLConnection buildConnection() {
@@ -55,14 +55,13 @@ class AirbrakeNotifier {
             host,
             apiPort,
             path
-        );
+        )
 
-        HttpURLConnection conn = (HttpURLConnection) apiURL.openConnection();
-        conn.setDoOutput(true);
-        conn.setRequestProperty("Content-type", "text/xml");
-        conn.setRequestProperty("Accept", "text/xml, application/xml");
-        conn.setRequestMethod("POST");
-        return conn;
+        HttpURLConnection conn = apiURL.openConnection()
+        conn.setDoOutput(true)
+        conn.setRequestProperty("Content-type", "text/xml")
+        conn.setRequestProperty("Accept", "text/xml, application/xml")
+        conn.setRequestMethod("POST")
+        return conn
     }
-
 }

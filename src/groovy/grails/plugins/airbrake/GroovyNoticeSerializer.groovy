@@ -3,7 +3,7 @@ package grails.plugins.airbrake
 import groovy.xml.MarkupBuilder
 
 class GroovyNoticeSerializer implements NoticeSerializer {
-	
+
 	String serialize(AirbrakeNotifier notifier, Notice notice) {
 		def writer = new StringWriter()
 		serialize(notifier, notice, writer)
@@ -13,7 +13,7 @@ class GroovyNoticeSerializer implements NoticeSerializer {
 	void serialize(AirbrakeNotifier airbrakeNotifier, Notice notice, Writer writer) {
 		new MarkupBuilder(writer).notice(version: '2.1') {
 			'api-key'(airbrakeNotifier.apiKey)
-			
+
 			'notifier' {
 				name(AirbrakeNotifier.NOTIFIER_NAME)
 				version(AirbrakeNotifier.NOTIFIER_VERSION)
@@ -25,7 +25,7 @@ class GroovyNoticeSerializer implements NoticeSerializer {
 				'class'(e.clazz)
 				message(e.message)
 				backtrace {
-					e.backtrace.each { 
+					e.backtrace.each {
 						'line'(
 							file: it.fileName,
 							number: it.lineNumber,
@@ -61,7 +61,7 @@ class GroovyNoticeSerializer implements NoticeSerializer {
 								var(key: k, v.toString())
 							}
 						}
-					}					
+					}
 				}
 			}
 
@@ -79,5 +79,5 @@ class GroovyNoticeSerializer implements NoticeSerializer {
 				}
 			}
 		}
-	}	
+	}
 }
