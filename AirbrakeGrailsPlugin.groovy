@@ -28,13 +28,14 @@ class AirbrakeGrailsPlugin {
 //    def organization = [ name: "My Company", url: "http://www.my-company.com/" ]
 
     // Any additional developers beyond the author specified above.
-    def developers = [ [ name: "Eric Berry", email: "cavneb@gmail.com" ], [ name: "Phuong LeCong", email: "phuong@reteltechnologies.com" ]]
+    def developers = [ [ name: "Eric Berry", email: "cavneb@gmail.com" ],
+                       [ name: "Phuong LeCong", email: "phuong@reteltechnologies.com" ]]
 
     // Location of the plugin's issue tracker.
-//    def issueManagement = [ system: "JIRA", url: "http://jira.grails.org/browse/GPMYPLUGIN" ]
+    def issueManagement = [ system: "GitHub", url: "https://github.com/cavneb/airbrake-grails/issues" ]
 
     // Online location of the plugin's browseable source code.
-//    def scm = [ url: "http://svn.codehaus.org/grails-plugins/" ]
+    def scm = [ url: "https://github.com/cavneb/airbrake-grails" ]
 
     def doWithWebDescriptor = { xml ->
         // TODO Implement additions to web.xml (optional), this event occurs before
