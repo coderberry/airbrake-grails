@@ -6,9 +6,9 @@ import org.codehaus.groovy.grails.web.util.WebUtils
 class GrailsWebRequestSupplementer implements NoticeSupplementer {
 	Notice supplement(Notice notice, LoggingEvent event) {
 
-		def webRequest = null
+		def webRequest
 
-		try { 
+		try {
 			webRequest = WebUtils.retrieveGrailsWebRequest()
 		} catch (Exception e) {
 		}
