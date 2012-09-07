@@ -1,0 +1,20 @@
+<plugin name='airbrake' version='0.3' grailsVersion='2.1 &gt; *'>
+  <author>Eric Berry</author>
+  <authorEmail>cavneb@gmail.com</authorEmail>
+  <title>Airbrake Plugin</title>
+  <description>Airbrake Client for Grails</description>
+  <documentation>http://grails.org/plugin/airbrake</documentation>
+  <type>AirbrakeGrailsPlugin</type>
+  <resources>
+    <resource>airbrake.AirbrakeTestController</resource>
+  </resources>
+  <repositories>
+    <repository name='grailsCentral' url='http://grails.org/plugins' />
+    <repository name='http://repo.grails.org/grails/core' url='http://repo.grails.org/grails/core/' />
+    <repository name='mavenCentral' url='http://repo1.maven.org/maven2/' />
+  </repositories>
+  <dependencies />
+  <plugins />
+  <runtimePluginRequirements />
+  <behavior />
+</plugin>
