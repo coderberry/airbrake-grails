@@ -5,9 +5,10 @@ log4j = {
     appenders {
         console name:'stdout', layout:pattern(conversionPattern: '%c %m%n')
 
-        appender name: 'airbrake', new grails.plugins.airbrake.AirbrakeAppender(
+        appender new grails.plugins.airbrake.AirbrakeAppender(
+                name: 'airbrake',
                 api_key: 'API_KEY',
-                env: ((Environment.current == Environment.PRODUCTION) ? 'prod' : 'dev')
+                env: ((Environment.current == Environment.PRODUCTION) ? 'production' : 'development')
         )
     }
 
