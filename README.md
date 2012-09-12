@@ -39,6 +39,16 @@ log4j = {
 }
 ```
 
+## Testing
+
+To test the Airbrake exception notification, an exception must be thrown in your application when running. You can visit the following url to trigger a test exception:
+
+```
+http://localhost:8080/airbrakeTest/throwException
+```
+
+Now log into Airbrake.io and you should see your exception listed.
+
 ## TODO
 
 * Update plugin to work with Grails version 2.0+
