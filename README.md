@@ -21,13 +21,15 @@ This plugin is compatible with Grails version 2.1 or greater.
 Once the plugin is installed, you only need to add a few lines of code into the `Config.groovy` file, all within the log4j map:
 
 ```groovy
+def isProd = Environment.current == Environment.PRODUCTION
+
 log4j = {
   // Example of changing the log pattern for the default console appender:
   appenders {
     appender new airbrake.AirbrakeAppender (
       name: 'airbrake',
       api_key: 'API_KEY', // replace with your Airbrake API key
-      env: ((Environment.current == Environment.PRODUCTION)  ? 'production' : 'development'),
+      env: (isProd ? 'production' : 'development'),
       enabled: true
     )
     ...
