@@ -15,6 +15,7 @@ class AirbrakeNotifier {
 
 	String apiKey
 	String env
+    List<String> filteredKeys
 
 	String host = AIRBRAKE_HOST
 	String port

@@ -8,6 +8,7 @@ log4j = {
         appender new grails.plugins.airbrake.AirbrakeAppender(
                 name: 'airbrake',
                 api_key: 'API_KEY',
+                filtered_keys: ['password'],
                 env: ((Environment.current == Environment.PRODUCTION) ? 'production' : 'development')
         )
     }

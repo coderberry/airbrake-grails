@@ -40,6 +40,10 @@ class AirbrakeAppender extends AppenderSkeleton {
 		notifier.secured = secured
 	}
 
+    void setFiltered_keys(List<String> keys) {
+        notifier.filteredKeys = keys
+    }
+
 	protected void addSupplementer(NoticeSupplementer s) {
 		supplementers.add(s)
 	}

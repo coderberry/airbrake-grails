@@ -44,21 +44,36 @@ class GroovyNoticeSerializer implements NoticeSerializer {
 					if (r.params) {
 						params {
 							r.params.each { k, v ->
-								var(key: k, v.toString())
+                                if (airbrakeNotifier.filteredKeys.contains(k)) {
+                                    var(key: k, "FILTERED")
+                                }
+                                else {
+                                    var(key: k, v.toString())
+                                }
 							}
 						}
 					}
 					if (r.session) {
 						session {
 							r.session.each { k, v ->
-								var(key: k, v.toString())
+                                if (airbrakeNotifier.filteredKeys.contains(k)) {
+                                    var(key: k, "FILTERED")
+                                }
+                                else {
+								    var(key: k, v.toString())
+                                }
 							}
 						}
 					}
 					if (r.cgiData) {
 						'cgi-data' {
 							r.cgiData.each { k, v ->
-								var(key: k, v.toString())
+                                if (airbrakeNotifier.filteredKeys.contains(k)) {
+                                    var(key: k, "FILTERED")
+                                }
+                                else {
+								    var(key: k, v.toString())
+                                }
 							}
 						}
 					}
