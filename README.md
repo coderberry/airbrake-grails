@@ -9,7 +9,7 @@ When an uncaught exception occurs, Airbrake will POST the relevant data to the A
 Add the following to your `BuildConfig.groovy`
 
 ```
-compile ":airbrake:0.4"
+compile ":airbrake:0.6"
 ```
 
 ## Compatability
@@ -29,6 +29,7 @@ log4j = {
     appender new airbrake.AirbrakeAppender (
       name: 'airbrake',
       api_key: 'API_KEY', // replace with your Airbrake API key
+      filtered_keys: ['password'], // optional list of filtered keys (session, params and CGI)
       env: (isProd ? 'production' : 'development'),
       enabled: true
     )
