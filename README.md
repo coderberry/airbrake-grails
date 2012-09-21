@@ -14,7 +14,7 @@ compile ":airbrake:0.7"
 
 ## Compatability
 
-This plugin is compatible with Grails version 2.1 or greater.
+This plugin is compatible with Grails version 2.0 or greater.
 
 ## Configuration
 
