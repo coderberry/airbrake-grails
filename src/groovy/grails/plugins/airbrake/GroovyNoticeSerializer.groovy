@@ -43,37 +43,22 @@ class GroovyNoticeSerializer implements NoticeSerializer {
 					action(r.action)
 					if (r.params) {
 						params {
-							r.params.each { k, v ->
-                                if (airbrakeNotifier.filteredKeys?.contains(k)) {
-                                    var(key: k, "FILTERED")
-                                }
-                                else {
-                                    var(key: k, v.toString())
-                                }
-							}
+                            filterParameters(r.params, airbrakeNotifier).each { k, v ->
+                                var(key: k, v)
+                            }
 						}
 					}
 					if (r.session) {
 						session {
-							r.session.each { k, v ->
-                                if (airbrakeNotifier.filteredKeys?.contains(k)) {
-                                    var(key: k, "FILTERED")
-                                }
-                                else {
-								    var(key: k, v.toString())
-                                }
-							}
+                            filterParameters(r.session, airbrakeNotifier).each { k, v ->
+                                var(key: k, v)
+                            }
 						}
 					}
 					if (r.cgiData) {
 						'cgi-data' {
-							r.cgiData.each { k, v ->
-                                if (airbrakeNotifier.filteredKeys?.contains(k)) {
-                                    var(key: k, "FILTERED")
-                                }
-                                else {
-								    var(key: k, v.toString())
-                                }
+                            filterParameters(r.cgiData, airbrakeNotifier).each { k, v ->
+                                var(key: k, v)
 							}
 						}
 					}
@@ -95,4 +80,13 @@ class GroovyNoticeSerializer implements NoticeSerializer {
 			}
 		}
 	}
+
+    private Map filterParameters(Map params, AirbrakeNotifier airbrakeNotifier) {
+        params.collectEntries { k, v ->
+            def filteredValue = airbrakeNotifier.filteredKeys?.any {
+                println "key $k, filter $it"
+                k =~ it } ? "FILTERED" : v.toString()
+            [(k): filteredValue]
+        }
+    }
 }

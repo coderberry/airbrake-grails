@@ -15,5 +15,8 @@ grails.project.dependency.resolution = {
         build(":release:2.0.4", ":rest-client-builder:1.0.2") {
             export = false
         }
+        test(':spock:0.6') {
+            export = false
+        }
     }
 }
