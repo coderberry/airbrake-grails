@@ -4,8 +4,10 @@ class AirbrakeGrailsPlugin {
     // the version or versions of Grails the plugin is designed for
     def grailsVersion = "2.0.0 > *"
     def pluginExcludes = [
-            "grails-app/views/error.gsp",
-            "test/**"
+            "grails-app/views/**",
+            "grails-app/controllers/**",
+            "test/**",
+            "web-app/**"
     ]
 
     def title = "Airbrake Plugin"

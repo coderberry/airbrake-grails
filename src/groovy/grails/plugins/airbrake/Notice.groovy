@@ -24,4 +24,5 @@ class Request {
 class ServerEnvironment {
 	String projectRoot
 	String appVersion
+    String hostname
 }
