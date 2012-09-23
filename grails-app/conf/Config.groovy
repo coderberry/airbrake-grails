@@ -1,16 +1,20 @@
+import grails.plugins.airbrake.test.MockUserSupplementer
+
 // configuration for plugin testing - will not be included in the plugin zip
 
 log4j = {
 
     appenders {
         console name:'stdout', layout:pattern(conversionPattern: '%c %m%n')
-
-        appender new grails.plugins.airbrake.AirbrakeAppender(
+        def airbrakeAppender = new grails.plugins.airbrake.AirbrakeAppender(
                 name: 'airbrake',
                 api_key: 'API_KEY',
                 filtered_keys: ['password'],
                 env: ((Environment.current == Environment.PRODUCTION) ? 'production' : 'development')
-        )
+                )
+        airbrakeAppender.addSupplementer(new MockUserSupplementer())
+
+        appender airbrakeAppender
     }
 
     error  'org.codehaus.groovy.grails.web.servlet',  //  controllers

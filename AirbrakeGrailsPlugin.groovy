@@ -6,6 +6,7 @@ class AirbrakeGrailsPlugin {
     def pluginExcludes = [
             "grails-app/views/**",
             "grails-app/controllers/**",
+            "src/groovy/grails/plugins/airbrake/test/**",
             "test/**",
             "web-app/**"
     ]

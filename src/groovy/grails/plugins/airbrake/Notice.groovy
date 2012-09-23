@@ -4,6 +4,7 @@ class Notice {
 	Error error = new Error()
 	Request request = new Request()
 	ServerEnvironment serverEnvironment = new ServerEnvironment()
+    Map user
 }
 
 class Error {

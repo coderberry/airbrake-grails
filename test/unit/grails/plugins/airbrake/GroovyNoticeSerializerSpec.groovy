@@ -83,8 +83,27 @@ class GroovyNoticeSerializerSpec extends Specification {
         xml.'server-environment'.'app-version'.text() == '1.2.3'
     }
 
+    def 'current-user'() {
+        def notifier = new AirbrakeNotifier()
+
+
+        def notice = new Notice()
+        notice.user = [id: '1234', name: 'Bugs Bunny', email: 'bugsbunny@acem.com', username: 'bugsbunny']
+
+        when: 'we serizlie'
+        def xml = getXmlFromSerializer(notifier, notice)
+
+        then:
+        xml.'current-user'.id.text() == '1234'
+        xml.'current-user'.name.text() == 'Bugs Bunny'
+        xml.'current-user'.email.text() == 'bugsbunny@acem.com'
+        xml.'current-user'.username.text() == 'bugsbunny'
+    }
+
     private getXmlFromSerializer(notifier, notice) {
         def serialized = serializer.serialize(notifier, notice)
         new XmlParser().parseText(serialized)
     }
+
+
 }

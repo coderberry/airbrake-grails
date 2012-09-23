@@ -81,6 +81,14 @@ class GroovyNoticeSerializer implements NoticeSerializer {
                     hostname(s.hostname)
                 }
 			}
+
+            if (notice.user) {
+                'current-user' {
+                    notice.user.each {k, v ->
+                        "$k"(v)
+                    }
+                }
+            }
 		}
 	}
 
