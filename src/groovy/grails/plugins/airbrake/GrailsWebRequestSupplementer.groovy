@@ -15,10 +15,24 @@ class GrailsWebRequestSupplementer implements NoticeSupplementer {
 
 		if (webRequest) {
 			def request = webRequest.currentRequest
-			def origUrl = request['javax.servlet.forward.request_uri'] ?: request.requestURL.toString()
+			def origUrl = request.forwardURI ?: request.requestURL.toString()
+
+            def urlPath = origUrl
+            if (request.queryString) {
+                urlPath += '?' + request.queryString
+            }
+
+            def defaultPort = request.scheme == 'https' ? 443 : 80
+
+            def url
+            if (defaultPort == request.serverPort) {
+                url = new URL(request.scheme, request.serverName, urlPath)
+            } else {
+                url = new URL(request.scheme, request.serverName, request.serverPort, urlPath)
+            }
 
 			def r = new Request(
-				url: "${request.scheme}://${request.serverName}:${request.serverPort}/${origUrl}?${request.queryString}",
+				url: url.toString(),
 				component: webRequest.controllerName,
 				action: webRequest.actionName,
 				params: webRequest.parameterMap
@@ -30,7 +44,13 @@ class GrailsWebRequestSupplementer implements NoticeSupplementer {
 				r.session = session.attributeNames.collect({ [(it): session[it] ] }).sum()
 			}
 
+            r.cgiData = [
+                HTTP_USER_AGENT: request.getHeader('User-Agent')
+            ]
+
 			notice.request = r
+
+            notice.serverEnvironment.hostname = InetAddress.localHost.hostName
 		}
 
 		notice

@@ -4,6 +4,7 @@ class Notice {
 	Error error = new Error()
 	Request request = new Request()
 	ServerEnvironment serverEnvironment = new ServerEnvironment()
+    Map user
 }
 
 class Error {
@@ -24,4 +25,5 @@ class Request {
 class ServerEnvironment {
 	String projectRoot
 	String appVersion
+    String hostname
 }

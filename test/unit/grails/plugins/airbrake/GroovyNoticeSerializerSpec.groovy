@@ -3,6 +3,9 @@ package grails.plugins.airbrake
 import spock.lang.*
 
 class GroovyNoticeSerializerSpec extends Specification {
+
+    def serializer = new GroovyNoticeSerializer()
+
     @Unroll
     def 'serialize filters #paramsMap'() {
         given: 'a notifier and a notice'
@@ -13,11 +16,9 @@ class GroovyNoticeSerializerSpec extends Specification {
         notice.request."$paramsMap" = [ask: 'me', something: 'interesting']
 
         when: 'we serizlie'
-        def serializer = new GroovyNoticeSerializer()
-        def serialized = serializer.serialize(notifier, notice)
+        def xml = getXmlFromSerializer(notifier, notice)
 
         then:
-        def xml = new XmlParser().parseText(serialized)
 
         def vars = xml.request."$varsMap".var
         vars[0].'@key' == 'ask'
@@ -39,16 +40,70 @@ class GroovyNoticeSerializerSpec extends Specification {
         notice.request.params = [ask: 'me', something: 'interesting']
 
         when: 'we serizlie'
-        def serializer = new GroovyNoticeSerializer()
-        def serialized = serializer.serialize(notifier, notice)
+        def xml = getXmlFromSerializer(notifier, notice)
 
         then:
-        def xml = new XmlParser().parseText(serialized)
-
         def vars = xml.request.params.var
         vars[0].'@key' == 'ask'
         vars[0].text() == 'FILTERED'
         vars[1].'@key' == 'something'
         vars[1].text() == 'interesting'
     }
+
+    def 'serialize server-environment include env'() {
+        given: 'a notifier and a notice'
+        def notifier = new AirbrakeNotifier()
+        notifier.env = 'development'
+
+        def notice = new Notice()
+
+        when: 'we serizlie'
+        def xml = getXmlFromSerializer(notifier, notice)
+
+        then:
+        xml.'server-environment'.'environment-name'.text() == 'development'
+    }
+
+    def 'serialize server-environment include notice.serverEnvironment'() {
+        given: 'a notifier and a notice'
+        def notifier = new AirbrakeNotifier()
+        notifier.env = 'development'
+
+        def notice = new Notice()
+        notice.serverEnvironment.hostname = 'myhost'
+        notice.serverEnvironment.projectRoot = 'my/root'
+        notice.serverEnvironment.appVersion = '1.2.3'
+
+        when: 'we serizlie'
+        def xml = getXmlFromSerializer(notifier, notice)
+
+        then:
+        xml.'server-environment'.hostname.text() == 'myhost'
+        xml.'server-environment'.'project-root'.text() == 'my/root'
+        xml.'server-environment'.'app-version'.text() == '1.2.3'
+    }
+
+    def 'current-user'() {
+        def notifier = new AirbrakeNotifier()
+
+
+        def notice = new Notice()
+        notice.user = [id: '1234', name: 'Bugs Bunny', email: 'bugsbunny@acem.com', username: 'bugsbunny']
+
+        when: 'we serizlie'
+        def xml = getXmlFromSerializer(notifier, notice)
+
+        then:
+        xml.'current-user'.id.text() == '1234'
+        xml.'current-user'.name.text() == 'Bugs Bunny'
+        xml.'current-user'.email.text() == 'bugsbunny@acem.com'
+        xml.'current-user'.username.text() == 'bugsbunny'
+    }
+
+    private getXmlFromSerializer(notifier, notice) {
+        def serialized = serializer.serialize(notifier, notice)
+        new XmlParser().parseText(serialized)
+    }
+
+
 }
