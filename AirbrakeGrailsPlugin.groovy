@@ -15,7 +15,7 @@ class AirbrakeGrailsPlugin {
     def documentation = "http://grails.org/plugin/airbrake"
 
     def license = "APACHE"
-    def developers = [ [ name: "Phuong LeCong", email: "phuong@reteltechnologies.com" ]]
+    def developers = [ [ name: "Phuong LeCong", email: "phuong@reteltechnologies.com" ], [ name: "Jon Palmer", email: "jpalmer@care.com" ] ]
 
     def issueManagement = [ system: "GitHub", url: "https://github.com/cavneb/airbrake-grails/issues" ]
     def scm = [ url: "https://github.com/cavneb/airbrake-grails" ]
