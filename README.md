@@ -26,13 +26,14 @@ def isProd = Environment.current == Environment.PRODUCTION
 log4j = {
   // Example of changing the log pattern for the default console appender:
   appenders {
-    appender new airbrake.AirbrakeAppender (
+    def airbrakeAppender = new grails.plugins.airbrake.AirbrakeAppender (
       name: 'airbrake',
-      api_key: 'API_KEY', // replace with your Airbrake API key
-      filtered_keys: ['password'], // optional list of filtered keys (session, params and CGI)
-      env: (isProd ? 'production' : 'development'),
+      api_key: 'API_KEY',
+      filtered_keys: ['password'],
+      env: ((Environment.current == Environment.PRODUCTION) ? 'production' : 'development'),
       enabled: true
     )
+    airbrakeAppender.addSupplementer(new MockUserSupplementer())
     ...
   }
 
