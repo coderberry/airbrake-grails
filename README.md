@@ -9,7 +9,7 @@ When an uncaught exception occurs, Airbrake will POST the relevant data to the A
 Add the following to your `BuildConfig.groovy`
 
 ```
-compile ":airbrake:0.7.1"
+compile ":airbrake:0.7.2"
 ```
 
 ## Compatability
