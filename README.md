@@ -33,7 +33,6 @@ log4j = {
       env: ((Environment.current == Environment.PRODUCTION) ? 'production' : 'development'),
       enabled: true
     )
-    airbrakeAppender.addSupplementer(new MockUserSupplementer())
     ...
   }
 
