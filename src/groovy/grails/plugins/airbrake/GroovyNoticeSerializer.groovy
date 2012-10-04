@@ -93,11 +93,16 @@ class GroovyNoticeSerializer implements NoticeSerializer {
 	}
 
     private Map filterParameters(Map params, AirbrakeNotifier airbrakeNotifier) {
-        params.collectEntries { k, v ->
+
+        def filteredParams = [:]
+
+        params.each { k, v ->
             def filteredValue = airbrakeNotifier.filteredKeys?.any {
                 // println "key $k, filter $it"
                 k =~ it } ? "FILTERED" : v.toString()
-            [(k): filteredValue]
+
+            filteredParams[k] = filteredValue
         }
+        filteredParams
     }
 }
