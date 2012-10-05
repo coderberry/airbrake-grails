@@ -1,12 +1,9 @@
 package grails.plugins.airbrake
-
-import org.apache.log4j.*
-import org.apache.log4j.spi.*
+import grails.util.Environment
 
 class AirbrakeNotifier {
 
 	static final String AIRBRAKE_HOST = 'airbrakeapp.com'
-	static final String AIRBRAKE_PORT = '80'
 	static final String AIRBRAKE_PATH = '/notifier_api/v2/notices'
 
 	static final String NOTIFIER_NAME = 'grails-airbrake'
@@ -14,7 +11,7 @@ class AirbrakeNotifier {
 	static final String NOTIFIER_URL = 'http://github.com/plecong/grails-airbrake'
 
 	String apiKey
-	String env
+	String env = Environment.current.name
     List<String> filteredKeys = []
 
 	String host = AIRBRAKE_HOST
