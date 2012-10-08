@@ -25,7 +25,7 @@ Once the plugin is installed, you only need to add a few lines of code into the 
 log4j = {
   // Example of changing the log pattern for the default console appender:
   appenders {
-    def airbrakeAppender = new grails.plugins.airbrake.AirbrakeAppender (
+    def airbrakeAppender = new grails.plugins.airbrake.AirbrakeAppender (5yy
       name: 'airbrake',
       api_key: 'API_KEY',
       filtered_keys: ['password']
@@ -38,6 +38,16 @@ log4j = {
   }
 }
 ```
+By default, the environment name used in Airbrake will match that of the current Grails environment. To change this default, set the env property of the AirbrakeAppender (above).
+
+```groovy
+  def airbrakeAppender = new grails.plugins.airbrake.AirbrakeAppender(
+    name: 'airbrake',
+    api_key: 'API_KEY',
+    filtered_keys: ['password'],
+    env: grails.util.Environment.current.name[0..0] // Airbrake env name changed from default value of Development/Test/Production to D/T/P
+  )
+``` 
 
 ## Testing
 
