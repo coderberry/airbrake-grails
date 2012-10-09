@@ -29,7 +29,7 @@ class GroovyNoticeSerializer implements NoticeSerializer {
 						'line'(
 							file: it.fileName,
 							number: it.lineNumber,
-							method: it.methodName
+							method: "${it.className}.${it.methodName}"
 						)
 					}
 				}
