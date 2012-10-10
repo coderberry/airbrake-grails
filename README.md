@@ -25,7 +25,7 @@ Once the plugin is installed, you only need to add a few lines of code into the 
 log4j = {
   // Example of changing the log pattern for the default console appender:
   appenders {
-    def airbrakeAppender = new grails.plugins.airbrake.AirbrakeAppender (5yy
+    def airbrakeAppender = new grails.plugins.airbrake.AirbrakeAppender (
       name: 'airbrake',
       api_key: 'API_KEY',
       filtered_keys: ['password']
