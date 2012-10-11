@@ -6,23 +6,82 @@ class GroovyNoticeSerializerSpec extends Specification {
 
     def serializer = new GroovyNoticeSerializer()
 
-    @Unroll
-    def 'serialize filters #paramsMap'() {
-        given: 'a notifier and a notice'
-        def notifier = new AirbrakeNotifier()
-        notifier.filteredKeys = ['ask' ]
+    def 'serialize apiKey'() {
+        given: 'a notice'
+        def notice = new Notice(apiKey: 'abcd')
 
+        when: 'we serialize'
+        def xml = getXmlFromSerializer(notice)
+
+        then:
+        xml.'api-key'.text() == 'abcd'
+    }
+
+    def 'should serialize the notifier data'() {
+        given: 'a notice'
+        def notice = new Notice()
+
+        when: 'we serialize'
+        def xml = getXmlFromSerializer(notice)
+
+        then:
+        xml.notifier.name.text() == AirbrakeNotifier.NOTIFIER_NAME
+        xml.notifier.version.text() == AirbrakeNotifier.NOTIFIER_VERSION
+        xml.notifier.url.text() == AirbrakeNotifier.NOTIFIER_URL
+    }
+
+    def 'serialize request'() {
+        given: 'a notice with a request'
+        def request = new Request(url: 'http://elmerfudd.com/traps/rabbits/net', component: 'RabbitTraps', action: 'net')
+        def notice = new Notice(request: request)
+
+        when: 'we serialize'
+        def xml = getXmlFromSerializer(notice)
+
+        then:
+        xml.request.url.text() == 'http://elmerfudd.com/traps/rabbits/net'
+        xml.request.component.text() == 'RabbitTraps'
+        xml.request.action.text() == 'net'
+    }
+
+    def 'serialize error'() {
+        given: 'a notice with an error'
+        def error = new Error(message: 'That rascally rabbit escaped', clazz: 'EscapeException')
+        error.backtrace = [
+                new StackTraceElement('com.acme.RabbitTraps', 'catch', 'RabbitTraps.groovy', 10 ),
+                new StackTraceElement('com.acme.RabbitTrapsController', 'net', 'RabbitTrapsController.groovy', 5 )
+        ]
+        def notice = new Notice(error: error)
+
+        when: 'we serialize'
+        def xml = getXmlFromSerializer(notice)
+
+        then:
+        xml.error.message.text() == 'That rascally rabbit escaped'
+        xml.error.'class'.text() == 'EscapeException'
+        def lines = xml.error.backtrace.line
+        lines[0].'@file' == 'RabbitTraps.groovy'
+        lines[0].'@number' == '10'
+        lines[0].'@method' == 'com.acme.RabbitTraps.catch'
+
+        lines[1].'@file' == 'RabbitTrapsController.groovy'
+        lines[1].'@number' == '5'
+        lines[1].'@method' == 'com.acme.RabbitTrapsController.net'
+    }
+    
+    @Unroll
+    def 'serialize #paramsMap'() {
+        given: 'a notice'
         def notice = new Notice()
         notice.request."$paramsMap" = [ask: 'me', something: 'interesting']
 
-        when: 'we serizlie'
-        def xml = getXmlFromSerializer(notifier, notice)
+        when: 'we serialize'
+        def xml = getXmlFromSerializer(notice)
 
         then:
-
         def vars = xml.request."$varsMap".var
         vars[0].'@key' == 'ask'
-        vars[0].text() == 'FILTERED'
+        vars[0].text() == 'me'
         vars[1].'@key' == 'something'
         vars[1].text() == 'interesting'
 
@@ -31,51 +90,26 @@ class GroovyNoticeSerializerSpec extends Specification {
         varsMap << ['params', 'session', 'cgi-data']
     }
 
-    def 'serialize supports regular expression filters '() {
-        given: 'a notifier and a notice'
-        def notifier = new AirbrakeNotifier()
-        notifier.filteredKeys = ['a.*' ]
-
-        def notice = new Notice()
-        notice.request.params = [ask: 'me', something: 'interesting']
-
-        when: 'we serizlie'
-        def xml = getXmlFromSerializer(notifier, notice)
-
-        then:
-        def vars = xml.request.params.var
-        vars[0].'@key' == 'ask'
-        vars[0].text() == 'FILTERED'
-        vars[1].'@key' == 'something'
-        vars[1].text() == 'interesting'
-    }
-
     def 'serialize server-environment include env'() {
-        given: 'a notifier and a notice'
-        def notifier = new AirbrakeNotifier()
-        notifier.env = 'development'
+        given: 'a notice with environment'
+        def notice = new Notice(env: 'development')
 
-        def notice = new Notice()
-
-        when: 'we serizlie'
-        def xml = getXmlFromSerializer(notifier, notice)
+        when: 'we serialize'
+        def xml = getXmlFromSerializer(notice)
 
         then:
         xml.'server-environment'.'environment-name'.text() == 'development'
     }
 
     def 'serialize server-environment include notice.serverEnvironment'() {
-        given: 'a notifier and a notice'
-        def notifier = new AirbrakeNotifier()
-        notifier.env = 'development'
-
-        def notice = new Notice()
+        given: 'a notice'
+        def notice = new Notice(env: 'development')
         notice.serverEnvironment.hostname = 'myhost'
         notice.serverEnvironment.projectRoot = 'my/root'
         notice.serverEnvironment.appVersion = '1.2.3'
 
-        when: 'we serizlie'
-        def xml = getXmlFromSerializer(notifier, notice)
+        when: 'we serialize'
+        def xml = getXmlFromSerializer(notice)
 
         then:
         xml.'server-environment'.hostname.text() == 'myhost'
@@ -84,14 +118,11 @@ class GroovyNoticeSerializerSpec extends Specification {
     }
 
     def 'current-user'() {
-        def notifier = new AirbrakeNotifier()
-
-
         def notice = new Notice()
         notice.user = [id: '1234', name: 'Bugs Bunny', email: 'bugsbunny@acem.com', username: 'bugsbunny']
 
-        when: 'we serizlie'
-        def xml = getXmlFromSerializer(notifier, notice)
+        when: 'we serialize'
+        def xml = getXmlFromSerializer(notice)
 
         then:
         xml.'current-user'.id.text() == '1234'
@@ -100,10 +131,9 @@ class GroovyNoticeSerializerSpec extends Specification {
         xml.'current-user'.username.text() == 'bugsbunny'
     }
 
-    private getXmlFromSerializer(notifier, notice) {
-        def serialized = serializer.serialize(notifier, notice)
-        new XmlParser().parseText(serialized)
+    private getXmlFromSerializer(def notice) {
+        StringWriter writer = new StringWriter()
+        serializer.toXml( notice, writer)
+        new XmlParser().parseText(writer.toString())
     }
-
-
 }
