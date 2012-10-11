@@ -21,7 +21,6 @@ This plugin is compatible with Grails version 2.0 or greater.
 Once the plugin is installed, you only need to add a few lines of code into the `Config.groovy` file, all within the log4j map:
 
 ```groovy
-def isProd = Environment.current == Environment.PRODUCTION
 
 log4j = {
   // Example of changing the log pattern for the default console appender:
@@ -29,9 +28,7 @@ log4j = {
     def airbrakeAppender = new grails.plugins.airbrake.AirbrakeAppender (
       name: 'airbrake',
       api_key: 'API_KEY',
-      filtered_keys: ['password'],
-      env: ((Environment.current == Environment.PRODUCTION) ? 'production' : 'development'),
-      enabled: true
+      filtered_keys: ['password']
     )
     ...
   }
@@ -41,6 +38,16 @@ log4j = {
   }
 }
 ```
+By default, the environment name used in Airbrake will match that of the current Grails environment. To change this default, set the env property of the AirbrakeAppender (above).
+
+```groovy
+  def airbrakeAppender = new grails.plugins.airbrake.AirbrakeAppender(
+    name: 'airbrake',
+    api_key: 'API_KEY',
+    filtered_keys: ['password'],
+    env: grails.util.Environment.current.name[0..0] // Airbrake env name changed from default value of Development/Test/Production to D/T/P
+  )
+``` 
 
 ## Testing
 
