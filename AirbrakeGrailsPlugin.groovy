@@ -30,8 +30,6 @@ class AirbrakeGrailsPlugin {
     def issueManagement = [ system: "GitHub", url: "https://github.com/cavneb/airbrake-grails/issues" ]
     def scm = [ url: "https://github.com/cavneb/airbrake-grails" ]
 
-    def appender
-
     def doWithSpring = {
 
         def options = application.config.grails.plugins.airbrake
