@@ -101,9 +101,13 @@ class GrailsNoticeBuilder {
     }
 
     private Map filterParameters(Map params) {
-        params?.collectEntries { k, v ->
+
+        def filteredParams = [:]
+
+        params.each {k, v ->
             def filteredValue = filteredKeys?.any { k =~ it } ? "FILTERED" : v.toString()
-            [(k): filteredValue]
+            filteredParams[k] = filteredValue
         }
+        filteredParams
     }
 }

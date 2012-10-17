@@ -1,9 +1,14 @@
 /target
+/target-eclipse
 *.log
 *.zip
 *.iml
+*.ipr
+*.iws
 out
 .idea
 .settings
 plugin.xml
-
+.classpath
+.project
+.gitignore

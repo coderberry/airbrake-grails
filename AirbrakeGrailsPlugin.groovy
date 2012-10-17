@@ -7,9 +7,9 @@ import grails.plugins.airbrake.UserDataService
 
 class AirbrakeGrailsPlugin {
     // the plugin version
-    def version = "0.8"
+    def version = "0.8-grails1"
     // the version or versions of Grails the plugin is designed for
-    def grailsVersion = "2.0.0 > *"
+    def grailsVersion = "1.3.5 > *"
     def pluginExcludes = [
             "grails-app/views/**",
             "grails-app/controllers/**",
@@ -25,7 +25,11 @@ class AirbrakeGrailsPlugin {
     def documentation = "http://grails.org/plugin/airbrake"
 
     def license = "APACHE"
-    def developers = [ [ name: "Phuong LeCong", email: "phuong@reteltechnologies.com" ], [ name: "Jon Palmer", email: "jpalmer@care.com" ] ]
+    def developers = [
+            [ name: "Phuong LeCong", email: "phuong@reteltechnologies.com" ],
+            [ name: "Jon Palmer", email: "jpalmer@care.com" ],
+            [ name: "Donal Murtagh", email: "domurtag@yahoo.co.uk" ]
+    ]
 
     def issueManagement = [ system: "GitHub", url: "https://github.com/cavneb/airbrake-grails/issues" ]
     def scm = [ url: "https://github.com/cavneb/airbrake-grails" ]
