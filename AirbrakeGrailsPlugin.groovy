@@ -7,7 +7,7 @@ import grails.plugins.airbrake.UserDataService
 
 class AirbrakeGrailsPlugin {
     // the plugin version
-    def version = "0.8-grails1"
+    def version = "0.8.1-grails1"
     // the version or versions of Grails the plugin is designed for
     def grailsVersion = "1.3.5 > *"
     def pluginExcludes = [

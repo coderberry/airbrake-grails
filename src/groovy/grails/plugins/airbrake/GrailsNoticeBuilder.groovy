@@ -27,7 +27,7 @@ class GrailsNoticeBuilder {
     }
 
     def addErrorDetails(Notice notice, String errorMessage, Throwable throwable) {
-        def message = errorMessage ?: throwable?.message
+        def message = throwable?.message ?: errorMessage
         Error error = new Error(
                 message: message
         )
