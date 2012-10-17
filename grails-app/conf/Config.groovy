@@ -1,20 +1,14 @@
-import grails.plugins.airbrake.test.MockUserSupplementer
 
 // configuration for plugin testing - will not be included in the plugin zip
+grails.plugins.airbrake.apiKey = 'YOUR_API_KEY'
+grails.plugins.airbrake.filteredKeys = ['password']
+grails.plugins.airbrake.userDataService = 'mockUserDataService'
+grails.plugins.airbrake.includeEventsWithoutExceptions = true
 
 log4j = {
 
     appenders {
         console name:'stdout', layout:pattern(conversionPattern: '%c %m%n')
-        def airbrakeAppender = new grails.plugins.airbrake.AirbrakeAppender(
-                name: 'airbrake',
-                api_key: 'API_KEY',
-                filtered_keys: ['password'],
-                env: ((Environment.current == Environment.PRODUCTION) ? 'production' : 'development')
-                )
-        airbrakeAppender.addSupplementer(new MockUserSupplementer())
-
-        appender airbrakeAppender
     }
 
     error  'org.codehaus.groovy.grails.web.servlet',  //  controllers
@@ -30,8 +24,9 @@ log4j = {
            'net.sf.ehcache.hibernate'
 
     warn   'org.mortbay.log'
+    debug  'grails.plugins.airbrake'
 
     root {
-        debug 'stdout', 'airbrake'
+        warn 'stdout'
     }
 }

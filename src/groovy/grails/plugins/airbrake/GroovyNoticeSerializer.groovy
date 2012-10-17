@@ -2,17 +2,11 @@ package grails.plugins.airbrake
 
 import groovy.xml.MarkupBuilder
 
-class GroovyNoticeSerializer implements NoticeSerializer {
+class GroovyNoticeSerializer {
 
-	String serialize(AirbrakeNotifier notifier, Notice notice) {
-		def writer = new StringWriter()
-		serialize(notifier, notice, writer)
-		writer.toString()
-	}
-
-	void serialize(AirbrakeNotifier airbrakeNotifier, Notice notice, Writer writer) {
-		new MarkupBuilder(writer).notice(version: '2.1') {
-			'api-key'(airbrakeNotifier.apiKey)
+	void toXml( Notice notice, Writer writer) {
+		new MarkupBuilder(writer).notice(version: AirbrakeNotifier.AIRBRAKE_API_VERSION) {
+			'api-key'(notice.apiKey)
 
 			'notifier' {
 				name(AirbrakeNotifier.NOTIFIER_NAME)
@@ -29,7 +23,7 @@ class GroovyNoticeSerializer implements NoticeSerializer {
 						'line'(
 							file: it.fileName,
 							number: it.lineNumber,
-							method: it.methodName
+							method: "${it.className}.${it.methodName}"
 						)
 					}
 				}
@@ -41,27 +35,16 @@ class GroovyNoticeSerializer implements NoticeSerializer {
 					url(r.url)
 					component(r.component)
 					action(r.action)
-					if (r.params) {
-						params {
-                            filterParameters(r.params, airbrakeNotifier).each { k, v ->
-                                var(key: k, v)
+
+                    [params: 'params', session: 'session', cgiData: 'cgi-data'].each { property, nodeName ->
+                        if (r."$property") {
+                            "$nodeName" {
+                                r."$property".each { k, v ->
+                                    var(key: k, v)
+                                }
                             }
-						}
-					}
-					if (r.session) {
-						session {
-                            filterParameters(r.session, airbrakeNotifier).each { k, v ->
-                                var(key: k, v)
-                            }
-						}
-					}
-					if (r.cgiData) {
-						'cgi-data' {
-                            filterParameters(r.cgiData, airbrakeNotifier).each { k, v ->
-                                var(key: k, v)
-							}
-						}
-					}
+                        }
+                    }
 				}
 			}
 
@@ -72,7 +55,7 @@ class GroovyNoticeSerializer implements NoticeSerializer {
 					'project-root'(s.projectRoot)
 				}
 
-				'environment-name'(airbrakeNotifier.env)
+				'environment-name'(notice.env)
 
 				if (s.appVersion) {
 					'app-version'(s.appVersion)
@@ -91,18 +74,4 @@ class GroovyNoticeSerializer implements NoticeSerializer {
             }
 		}
 	}
-
-    private Map filterParameters(Map params, AirbrakeNotifier airbrakeNotifier) {
-
-        def filteredParams = [:]
-
-        params.each { k, v ->
-            def filteredValue = airbrakeNotifier.filteredKeys?.any {
-                // println "key $k, filter $it"
-                k =~ it } ? "FILTERED" : v.toString()
-
-            filteredParams[k] = filteredValue
-        }
-        filteredParams
-    }
 }

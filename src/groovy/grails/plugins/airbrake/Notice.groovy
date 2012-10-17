@@ -1,6 +1,8 @@
 package grails.plugins.airbrake
 
 class Notice {
+    String apiKey
+    String env
 	Error error = new Error()
 	Request request = new Request()
 	ServerEnvironment serverEnvironment = new ServerEnvironment()
