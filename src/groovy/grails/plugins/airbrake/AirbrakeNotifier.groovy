@@ -1,10 +1,8 @@
 package grails.plugins.airbrake
 
-import groovy.transform.ToString
-import groovy.util.logging.Log4j
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
-@ToString(includeNames=true)
-@Log4j
 class AirbrakeNotifier {
     static final String AIRBRAKE_API_VERSION = '2.2'
 	static final String AIRBRAKE_HOST = 'airbrakeapp.com'
@@ -13,6 +11,8 @@ class AirbrakeNotifier {
 	static final String NOTIFIER_NAME = 'grails-airbrake'
 	static final String NOTIFIER_VERSION = '0.1'
 	static final String NOTIFIER_URL = 'http://github.com/plecong/grails-airbrake'
+
+    private static final Logger log = LoggerFactory.getLogger(this)
 
     String host
     Integer port

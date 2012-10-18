@@ -27,7 +27,12 @@ class GrailsNoticeBuilder {
     }
 
     def addErrorDetails(Notice notice, String errorMessage, Throwable throwable) {
-        def message = errorMessage ?: throwable?.message
+        // Grails creates a really long error message for uncaught exceptions. Essentially a combination of all the webRequest meta data.
+        // However it creates very unhelpful messages for airbrake so we just prefer the simpler message on the throwable
+        // This means for exceptions logged by the app code like log.error(message, exception) that we ignore the supplied message.
+        // This is less than idea (we expect the user supplied message to be useful) but by the time the Appender has the details we
+        // cannot distinuish between the caught and uncaught cases.
+        def message = throwable?.message ?: errorMessage
         Error error = new Error(
                 message: message
         )
@@ -101,9 +106,13 @@ class GrailsNoticeBuilder {
     }
 
     private Map filterParameters(Map params) {
-        params?.collectEntries { k, v ->
+
+        def filteredParams = [:]
+
+        params.each {k, v ->
             def filteredValue = filteredKeys?.any { k =~ it } ? "FILTERED" : v.toString()
-            [(k): filteredValue]
+            filteredParams[k] = filteredValue
         }
+        filteredParams
     }
 }

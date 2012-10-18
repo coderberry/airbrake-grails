@@ -18,7 +18,7 @@ class AirbrakeAppender extends AppenderSkeleton {
 	@Override
 	protected void append(final LoggingEvent loggingEvent) {
 		if (notifier.enabled && (loggingEvent?.throwableInformation || includeEventsWithoutExceptions) ) {
-			notifier.notify(loggingEvent.renderedMessage, loggingEvent.throwableInformation?.throwable)
+			notifier.notify(loggingEvent.message.toString(), loggingEvent.throwableInformation?.throwable)
 		}
 	}
 
