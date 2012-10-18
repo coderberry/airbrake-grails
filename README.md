@@ -9,7 +9,7 @@ When an uncaught exception occurs, Airbrake will POST the relevant data to the A
 Add the following to your `BuildConfig.groovy`
 
 ```
-compile ":airbrake:0.8"
+compile ":airbrake:0.8.1"
 ```
 
 Once the plugin is installed, you need to provide your Api Key in `Config.groovy` file:
