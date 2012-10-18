@@ -183,7 +183,7 @@ class GrailsNoticeBuilderSpec extends Specification {
         notice.error.backtrace == [new StackTraceElement('com.acme.RabbitTraps', 'catch', 'RabbitTraps.groovy', 10 )]
     }
 
-    def 'buildNotice creates a Notice with the supplied message rather than the exception message'() {
+    def 'buildNotice creates a Notice with the the exception message rather than supplied message'() {
         given:
         def GrailsNoticeBuilder grailsNoticeBuilder = new GrailsNoticeBuilder()
 
@@ -193,7 +193,7 @@ class GrailsNoticeBuilderSpec extends Specification {
         def notice = grailsNoticeBuilder.buildNotice('That rascally rabbit escaped', exception)
 
         then:
-        notice.error.message == 'That rascally rabbit escaped'
+        notice.error.message == 'Damn that Rabbit'
     }
 
     private bindMockRequest() {
