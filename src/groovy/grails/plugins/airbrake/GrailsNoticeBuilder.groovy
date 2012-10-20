@@ -1,6 +1,8 @@
 package grails.plugins.airbrake
 
-import org.codehaus.groovy.grails.web.util.WebUtils
+import javax.servlet.http.HttpServletRequest
+import org.codehaus.groovy.grails.web.servlet.mvc.GrailsWebRequest
+import org.springframework.web.context.request.RequestContextHolder
 
 class GrailsNoticeBuilder {
     String apiKey
@@ -18,30 +20,31 @@ class GrailsNoticeBuilder {
     }
 
     Notice buildNotice(String errorMessage, Throwable throwable) {
-        def notice = new Notice(apiKey: apiKey, env: env)
-        addErrorDetails(notice, errorMessage, throwable)
-        addWebRequestDetails(notice)
+        def args = [apiKey: apiKey, env: env]
+        args << getErrorDetails(errorMessage, throwable)
+        args << getWebRequestDetails()
+        args << (NoticeContextHolder.noticeContext ?: [:])
+        def notice = new Notice(args)
         addSupplementerDetails(notice)
         filter(notice)
         notice
     }
 
-    def addErrorDetails(Notice notice, String errorMessage, Throwable throwable) {
+    def getErrorDetails(String errorMessage, Throwable throwable) {
         // Grails creates a really long error message for uncaught exceptions. Essentially a combination of all the webRequest meta data.
         // However it creates very unhelpful messages for airbrake so we just prefer the simpler message on the throwable
         // This means for exceptions logged by the app code like log.error(message, exception) that we ignore the supplied message.
         // This is less than idea (we expect the user supplied message to be useful) but by the time the Appender has the details we
-        // cannot distinuish between the caught and uncaught cases.
-        def message = throwable?.message ?: errorMessage
-        Error error = new Error(
-                message: message
-        )
+        // cannot distinguish between the caught and uncaught cases.
+        def errorDetails = [errorMessage: throwable?.message ?: errorMessage]
 
         if (throwable) {
-            error.clazz = throwable.class.name
-            error.backtrace = throwable.stackTrace
+            errorDetails << [
+                errorClass: throwable.class.name,
+                backtrace: throwable.stackTrace
+            ]
         }
-        notice.error = error
+        errorDetails
     }
 
     def addSupplementerDetails(Notice notice) {
@@ -50,65 +53,64 @@ class GrailsNoticeBuilder {
         }
     }
 
-    def addWebRequestDetails(Notice notice) {
-		def webRequest
 
-		try {
-			webRequest = WebUtils.retrieveGrailsWebRequest()
-		} catch (Exception e) {
-		}
+    def getWebRequestDetails() {
+        def requestDetails = [hostname: InetAddress.localHost.hostName]
 
-		if (webRequest) {
-			def request = webRequest.currentRequest
-			def origUrl = request.forwardURI
+		def webRequest = (GrailsWebRequest) RequestContextHolder.requestAttributes
 
-            def urlPath = origUrl
-            if (request.queryString) {
-                urlPath += '?' + request.queryString
-            }
-
-            def defaultPort = request.scheme == 'https' ? 443 : 80
-
-            def url
-            if (defaultPort == request.serverPort) {
-                url = new URL(request.scheme, request.serverName, urlPath)
-            } else {
-                url = new URL(request.scheme, request.serverName, request.serverPort, urlPath)
-            }
-
-			def r = new Request(
-				url: url.toString(),
-				component: webRequest.controllerName,
-				action: webRequest.actionName,
-				params: webRequest.parameterMap
-			)
+		if(webRequest) {
+            def request = webRequest.currentRequest
+            requestDetails << [
+                    url: constructUrl(request),
+                    component: webRequest.controllerName,
+                    action: webRequest.actionName,
+                    params: webRequest.parameterMap,
+            ]
 
 			def session = request.getSession(false)
 
 			if (session) {
-				r.session = session.attributeNames.collect({ [(it): session[it] ] }).sum()
+                requestDetails.session = session.attributeNames.iterator().collectEntries{ [(it): session[it] ] }
 			}
 
-            r.cgiData = [
+            requestDetails.cgiData = [
                 HTTP_USER_AGENT: request.getHeader('User-Agent'),
                 HTTP_REFERER: request.getHeader('Referer')
             ]
-
-			notice.request = r
-
-            notice.serverEnvironment.hostname = InetAddress.localHost.hostName
 		}
+        requestDetails
 	}
+
+    private String constructUrl(HttpServletRequest request) {
+        def origUrl = request.forwardURI
+
+        def urlPath = origUrl
+        if (request.queryString) {
+            urlPath += '?' + request.queryString
+        }
+
+        def defaultPort = request.scheme == 'https' ? 443 : 80
+
+        def url
+        if (defaultPort == request.serverPort) {
+            url = new URL(request.scheme, request.serverName, urlPath)
+        } else {
+            url = new URL(request.scheme, request.serverName, request.serverPort, urlPath)
+        }
+
+        url.toString()
+    }
 
     private filter(Notice notice) {
         ['session', 'cgiData', 'params'].each {
-            notice.request."$it" = filterParameters(notice.request."$it")
+            notice."$it" = filterParameters(notice."$it")
         }
     }
 
     private Map filterParameters(Map params) {
         params?.collectEntries { k, v ->
-            def filteredValue = filteredKeys?.any { k =~ it } ? "FILTERED" : v.toString()
+            def filteredValue = filteredKeys?.any { k =~ it } ? "[FILTERED]" : v.toString()
             [(k): filteredValue]
         }
     }

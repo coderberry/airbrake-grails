@@ -56,11 +56,15 @@ class AirbrakeNotifier {
 
     void notify(String errorMessage, Throwable throwable) {
         if (enabled) {
+            // if we're not enabled don't go through the effort of building the message
             doNotify(grailsNoticeBuilder.buildNotice(errorMessage, throwable))
         }
     }
 
 	private doNotify(Notice notice) {
+        if (!enabled) {
+            return
+        }
         if (!notice.apiKey) {
             throw new RuntimeException("The API key for the project this error is from is required. Get this from the project's page in airbrake.")
         }

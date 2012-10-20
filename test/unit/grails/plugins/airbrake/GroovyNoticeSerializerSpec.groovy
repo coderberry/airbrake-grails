@@ -30,10 +30,10 @@ class GroovyNoticeSerializerSpec extends Specification {
         xml.notifier.url.text() == AirbrakeNotifier.NOTIFIER_URL
     }
 
-    def 'serialize request'() {
+    def 'serialize request params'() {
         given: 'a notice with a request'
-        def request = new Request(url: 'http://elmerfudd.com/traps/rabbits/net', component: 'RabbitTraps', action: 'net')
-        def notice = new Notice(request: request)
+        def args = [url: 'http://elmerfudd.com/traps/rabbits/net', component: 'RabbitTraps', action: 'net']
+        def notice = new Notice(args)
 
         when: 'we serialize'
         def xml = getXmlFromSerializer(notice)
@@ -46,12 +46,12 @@ class GroovyNoticeSerializerSpec extends Specification {
 
     def 'serialize error'() {
         given: 'a notice with an error'
-        def error = new Error(message: 'That rascally rabbit escaped', clazz: 'EscapeException')
-        error.backtrace = [
+        def args = [errorMessage: 'That rascally rabbit escaped', errorClass: 'EscapeException']
+        args.backtrace = [
                 new StackTraceElement('com.acme.RabbitTraps', 'catch', 'RabbitTraps.groovy', 10 ),
                 new StackTraceElement('com.acme.RabbitTrapsController', 'net', 'RabbitTrapsController.groovy', 5 )
         ]
-        def notice = new Notice(error: error)
+        def notice = new Notice(args)
 
         when: 'we serialize'
         def xml = getXmlFromSerializer(notice)
@@ -73,7 +73,7 @@ class GroovyNoticeSerializerSpec extends Specification {
     def 'serialize #paramsMap'() {
         given: 'a notice'
         def notice = new Notice()
-        notice.request."$paramsMap" = [ask: 'me', something: 'interesting']
+        notice."$paramsMap" = [ask: 'me', something: 'interesting']
 
         when: 'we serialize'
         def xml = getXmlFromSerializer(notice)
@@ -104,9 +104,9 @@ class GroovyNoticeSerializerSpec extends Specification {
     def 'serialize server-environment include notice.serverEnvironment'() {
         given: 'a notice'
         def notice = new Notice(env: 'development')
-        notice.serverEnvironment.hostname = 'myhost'
-        notice.serverEnvironment.projectRoot = 'my/root'
-        notice.serverEnvironment.appVersion = '1.2.3'
+        notice.hostname = 'myhost'
+        notice.projectRoot = 'my/root'
+        notice.appVersion = '1.2.3'
 
         when: 'we serialize'
         def xml = getXmlFromSerializer(notice)

@@ -28,4 +28,31 @@ class AirbrakeServiceSpec extends Specification {
         then:
         1 * service.airbrakeNotifier.notify('That rascally rabbit escaped', null)
     }
+
+    // prove that the helper methods on the service are just pass throughs to the NoticeRequestContextHolder
+    def 'set component, action, params'() {
+        when:
+        service.addNoticeContext('component', 'action', [one: 'two'])
+
+        then:
+        Map context = NoticeContextHolder.noticeContext
+        context.component == 'component'
+        context.action == 'action'
+        context.params == [one: 'two']
+    }
+
+    def 'set context'() {
+        given:
+        def context = [some: 'param']
+
+        when:
+        service.addNoticeContext(context)
+
+        then:
+        NoticeContextHolder.noticeContext == [some: 'param']
+    }
+
+    def cleanup() {
+        NoticeContextHolder.clearNoticeContext()
+    }
 }

@@ -15,11 +15,10 @@ class GroovyNoticeSerializer {
 			}
 
 			error {
-				def e = notice.error
-				'class'(e.clazz)
-				message(e.message)
+				'class'(notice.errorClass)
+				message(notice.errorMessage)
 				backtrace {
-					e.backtrace.each {
+					notice.backtrace.each {
 						'line'(
 							file: it.fileName,
 							number: it.lineNumber,
@@ -29,17 +28,16 @@ class GroovyNoticeSerializer {
 				}
 			}
 
-			if (notice.request) {
-				def r = notice.request
+			if (notice.url || notice.component || notice.action || notice.params || notice.session || notice.cgiData) {
 				request {
-					url(r.url)
-					component(r.component)
-					action(r.action)
+					url(notice.url)
+					component(notice.component)
+					action(notice.action)
 
                     [params: 'params', session: 'session', cgiData: 'cgi-data'].each { property, nodeName ->
-                        if (r."$property") {
+                        if (notice."$property") {
                             "$nodeName" {
-                                r."$property".each { k, v ->
+                                notice."$property".each { k, v ->
                                     var(key: k, v)
                                 }
                             }
@@ -49,19 +47,17 @@ class GroovyNoticeSerializer {
 			}
 
 			'server-environment' {
-				def s = notice.serverEnvironment
-
-				if (s.projectRoot) {
-					'project-root'(s.projectRoot)
+				if (notice.projectRoot) {
+					'project-root'(notice.projectRoot)
 				}
 
 				'environment-name'(notice.env)
 
-				if (s.appVersion) {
-					'app-version'(s.appVersion)
+				if (notice.appVersion) {
+					'app-version'(notice.appVersion)
 				}
-                if (s.hostname) {
-                    hostname(s.hostname)
+                if (notice.hostname) {
+                    hostname(notice.hostname)
                 }
 			}
 

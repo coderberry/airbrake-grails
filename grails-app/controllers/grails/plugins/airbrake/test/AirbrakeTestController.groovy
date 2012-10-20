@@ -35,4 +35,13 @@ class AirbrakeTestController {
         def realMessage = message ?: "ErrorMessage"
         airbrakeService.notify("${realMessage} ${System.currentTimeMillis()}")
     }
+
+    def customContext(String message, String customComponent, String customAction) {
+        message = message ?: "CustomContext"
+        customComponent = customComponent ?: 'CustomComponent'
+        customAction = customAction ?: 'CustomAction'
+        def time = System.currentTimeMillis()
+        airbrakeService.addNoticeContext(customComponent, customAction, [time: time])
+        airbrakeService.notify("${message} ${time}")
+    }
 }

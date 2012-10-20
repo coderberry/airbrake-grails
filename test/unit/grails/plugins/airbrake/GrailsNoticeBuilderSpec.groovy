@@ -33,7 +33,7 @@ class GrailsNoticeBuilderSpec extends Specification {
         def notice = grailsNoticeBuilder.buildNotice(null, null)
 
         then:
-        notice.request.url == null
+        notice.url == null
     }
 
     @Unroll
@@ -49,7 +49,7 @@ class GrailsNoticeBuilderSpec extends Specification {
         def notice = grailsNoticeBuilder.buildNotice(null, null)
 
         then:
-        notice.request.url == expectedUrl
+        notice.url == expectedUrl
 
         where:
         scheme   | host         | port || expectedUrl
@@ -71,7 +71,7 @@ class GrailsNoticeBuilderSpec extends Specification {
         def notice = grailsNoticeBuilder.buildNotice(null, null)
 
         then:
-        notice.request.url == 'http://myhost.com/controller/action'
+        notice.url == 'http://myhost.com/controller/action'
     }
 
     def 'url should handle no forwardUri '() {
@@ -86,9 +86,8 @@ class GrailsNoticeBuilderSpec extends Specification {
         def notice = grailsNoticeBuilder.buildNotice(null, null)
 
         then:
-        notice.request.url == 'http://myhost.com'
+        notice.url == 'http://myhost.com'
     }
-
 
     @Unroll
     def 'url should handle queryString: #queryString'() {
@@ -104,7 +103,7 @@ class GrailsNoticeBuilderSpec extends Specification {
         def notice = grailsNoticeBuilder.buildNotice(null, null)
 
         then:
-        notice.request.url == expectedUrl
+        notice.url == expectedUrl
 
         where:
         queryString || expectedUrl
@@ -123,21 +122,19 @@ class GrailsNoticeBuilderSpec extends Specification {
         def notice = grailsNoticeBuilder.buildNotice(null, null)
 
         then:
-        notice.request.cgiData == [HTTP_USER_AGENT: 'Mozilla', HTTP_REFERER: 'http://your.referrer.com']
+        notice.cgiData == [HTTP_USER_AGENT: 'Mozilla', HTTP_REFERER: 'http://your.referrer.com']
     }
 
     def 'serverEnvironment should include the hostname'() {
-        bindMockRequest()
-
         when:
         def notice = grailsNoticeBuilder.buildNotice(null, null)
 
         then:
-        notice.serverEnvironment.hostname == InetAddress.localHost.hostName
+        notice.hostname == InetAddress.localHost.hostName
     }
 
     @Unroll
-    def 'buildNotice should filter request.#paramsMap'() {
+    def 'buildNotice should filter #paramsMap'() {
         given: 'some filteredKeys'
 
         grailsNoticeBuilder.filteredKeys = ['ask' ]
@@ -148,14 +145,14 @@ class GrailsNoticeBuilderSpec extends Specification {
         def notice = grailsNoticeBuilder.buildNotice(null, null)
 
         then:
-        notice.request."$paramsMap" == [ask: 'FILTERED', something: 'interesting']
+        notice."$paramsMap" == [ask: '[FILTERED]', something: 'interesting']
 
         where:
         paramsMap << ['params', 'session', 'cgiData']
     }
 
     @Unroll
-    def 'buildNotice should filter request.#paramsMap using regular expression filters'() {
+    def 'buildNotice should filter #paramsMap using regular expression filters'() {
         given: 'a notifier and a notice'
         grailsNoticeBuilder.filteredKeys = ['a.*' ]
         grailsNoticeBuilder.supplementers = [ new RequestOverwritingSupplementer(ask: 'me', something: 'interesting')]
@@ -164,7 +161,7 @@ class GrailsNoticeBuilderSpec extends Specification {
         def notice = grailsNoticeBuilder.buildNotice(null, null)
 
         then:
-        notice.request."$paramsMap" == [ask: 'FILTERED', something: 'interesting']
+        notice."$paramsMap" == [ask: '[FILTERED]', something: 'interesting']
 
         where:
         paramsMap << ['params', 'session', 'cgiData']
@@ -178,9 +175,9 @@ class GrailsNoticeBuilderSpec extends Specification {
         def notice = grailsNoticeBuilder.buildNotice('That rascally rabbit escaped', null)
 
         then:
-        notice.error.message == 'That rascally rabbit escaped'
-        notice.error.backtrace == null
-        notice.error.clazz == null
+        notice.errorMessage == 'That rascally rabbit escaped'
+        notice.backtrace == null
+        notice.errorClass == null
     }
 
     def 'buildNotice creates a Notice with the right error message, class and backtrace'() {
@@ -194,9 +191,9 @@ class GrailsNoticeBuilderSpec extends Specification {
         def notice = grailsNoticeBuilder.buildNotice(null, exception)
 
         then:
-        notice.error.message == 'That rascally rabbit escaped'
-        notice.error.clazz == 'java.lang.RuntimeException'
-        notice.error.backtrace == [new StackTraceElement('com.acme.RabbitTraps', 'catch', 'RabbitTraps.groovy', 10 )]
+        notice.errorMessage == 'That rascally rabbit escaped'
+        notice.errorClass == 'java.lang.RuntimeException'
+        notice.backtrace == [new StackTraceElement('com.acme.RabbitTraps', 'catch', 'RabbitTraps.groovy', 10 )]
     }
 
     def 'buildNotice creates a Notice with the the exception message rather than supplied message'() {
@@ -209,7 +206,28 @@ class GrailsNoticeBuilderSpec extends Specification {
         def notice = grailsNoticeBuilder.buildNotice('That rascally rabbit escaped', exception)
 
         then:
-        notice.error.message == 'Damn that Rabbit'
+        notice.errorMessage == 'Damn that Rabbit'
+    }
+
+    def 'RequestContext should override webRequest data'() {
+        given:
+        mockRequest.scheme = 'http'
+        mockRequest.serverName = 'myhost.com'
+        mockRequest.serverPort = 80
+        mockRequest.forwardURI = '/controller/action'
+        bindMockRequest()
+
+        and:
+        NoticeContextHolder.addNoticeContext('customComponent', 'customAction', [some: 'param'])
+
+        when:
+        def notice = grailsNoticeBuilder.buildNotice(null, null)
+
+        then:
+        notice.url == 'http://myhost.com/controller/action' // this is not changed by the NoticeContext
+        notice.component == 'customComponent'
+        notice.action == 'customAction'
+        notice.params == [some: 'param']
     }
 
     private bindMockRequest() {
@@ -226,9 +244,13 @@ class GrailsNoticeBuilderSpec extends Specification {
 
         @Override
         void supplement(Notice notice) {
-            notice.request.session = params
-            notice.request.cgiData = params
-            notice.request.params = params
+            notice.session = params
+            notice.cgiData = params
+            notice.params = params
         }
+    }
+
+    def cleanup() {
+        NoticeContextHolder.clearNoticeContext()
     }
 }
