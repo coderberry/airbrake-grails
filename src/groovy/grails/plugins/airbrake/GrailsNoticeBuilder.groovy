@@ -90,7 +90,8 @@ class GrailsNoticeBuilder {
 			}
 
             r.cgiData = [
-                HTTP_USER_AGENT: request.getHeader('User-Agent')
+                HTTP_USER_AGENT: request.getHeader('User-Agent'),
+                HTTP_REFERER: request.getHeader('Referer')
             ]
 
 			notice.request = r

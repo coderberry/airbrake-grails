@@ -101,13 +101,14 @@ class GrailsNoticeBuilderSpec extends Specification {
     def 'cgiData'() {
         given:
         mockRequest.addHeader('User-Agent', 'Mozilla')
+        mockRequest.addHeader('Referer', 'http://your.referrer.com')
         bindMockRequest()
 
         when:
         def notice = grailsNoticeBuilder.buildNotice(null, null)
 
         then:
-        notice.request.cgiData == [HTTP_USER_AGENT: 'Mozilla']
+        notice.request.cgiData == [HTTP_USER_AGENT: 'Mozilla', HTTP_REFERER: 'http://your.referrer.com']
     }
 
     def 'serverEnvironment should include the hostname'() {
