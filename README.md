@@ -140,6 +140,24 @@ This plugin is compatible with Grails version 2.0 or greater.
 
 * Support stacktrace filtering
 
+## Release Notes
+
+* 0.7 - 2012/09/21
+	* Added support for filtering parameters, session and cgiData. #2
+* 0.7.1 - 2012/09/21
+	* Change supported Grails version to 2.0.0. #3
+* 0.7.2 - 2012/09/24
+	* Added User Agent, Hostname and user data to notifications
+* 0.8 - 2012/10/16
+	* Simpler configuration (Breaking change)
+	* Default notification environment to current Grails environment. #9
+	* Support for notifying caught exceptions. #15
+	* Support for notifying all messages logged at the error level (with or without exceptions)
+	* Simpler api for providing user data
+	* Full class names in stacktrace. #11
+* 0.8.1 - 2012/10/19
+	* Better erorr message for uncaught exceptions. #18
+
 ## Contributing
 
 
