@@ -59,7 +59,6 @@ class GrailsNoticeBuilderSpec extends Specification {
         'https'  | 'myhost.com' | 4434 || 'https://myhost.com:4434/'
     }
 
-    @Unroll
     def 'url should include forwardUri'() {
         given:
         mockRequest.scheme = 'http'
@@ -74,6 +73,22 @@ class GrailsNoticeBuilderSpec extends Specification {
         then:
         notice.request.url == 'http://myhost.com/controller/action'
     }
+
+    def 'url should handle no forwardUri '() {
+        given:
+        mockRequest.scheme = 'http'
+        mockRequest.serverName = 'myhost.com'
+        mockRequest.serverPort = 80
+        mockRequest.forwardURI = null
+        bindMockRequest()
+
+        when:
+        def notice = grailsNoticeBuilder.buildNotice(null, null)
+
+        then:
+        notice.request.url == 'http://myhost.com'
+    }
+
 
     @Unroll
     def 'url should handle queryString: #queryString'() {

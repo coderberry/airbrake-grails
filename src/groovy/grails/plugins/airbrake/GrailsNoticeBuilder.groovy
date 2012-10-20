@@ -60,7 +60,7 @@ class GrailsNoticeBuilder {
 
 		if (webRequest) {
 			def request = webRequest.currentRequest
-			def origUrl = request.forwardURI ?: request.requestURL.toString()
+			def origUrl = request.forwardURI
 
             def urlPath = origUrl
             if (request.queryString) {
