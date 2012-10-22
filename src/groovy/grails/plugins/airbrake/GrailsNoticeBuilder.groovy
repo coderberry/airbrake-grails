@@ -71,14 +71,14 @@ class GrailsNoticeBuilder {
 			def session = request.getSession(false)
 
 			if (session) {
-                requestDetails.session = session.attributeNames.iterator().collectEntries{ [(it): session[it] ] }
+                requestDetails.session = [:]
+                session.attributeNames.each { requestDetails.session[it] = session.getAttribute(it) }
 			}
 
-            requestDetails.cgiData = [
-                HTTP_USER_AGENT: request.getHeader('User-Agent'),
-                HTTP_REFERER: request.getHeader('Referer')
-            ]
+            requestDetails.cgiData = [:]
+            request.headerNames.each { requestDetails.cgiData[it] =  request.getHeader(it) }
 		}
+
         requestDetails
 	}
 

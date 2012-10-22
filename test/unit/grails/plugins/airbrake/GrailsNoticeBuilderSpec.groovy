@@ -37,7 +37,7 @@ class GrailsNoticeBuilderSpec extends Specification {
     }
 
     @Unroll
-    def 'url should handle protocol: #protocol and port: #port'() {
+    def 'url should handle protocol: #scheme and port: #port'() {
         given:
         mockRequest.scheme = scheme
         mockRequest.serverName = host
@@ -122,7 +122,7 @@ class GrailsNoticeBuilderSpec extends Specification {
         def notice = grailsNoticeBuilder.buildNotice(null, null)
 
         then:
-        notice.cgiData == [HTTP_USER_AGENT: 'Mozilla', HTTP_REFERER: 'http://your.referrer.com']
+        notice.cgiData == ['User-Agent': 'Mozilla', Referer: 'http://your.referrer.com']
     }
 
     def 'serverEnvironment should include the hostname'() {
