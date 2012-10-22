@@ -2,9 +2,17 @@ package grails.plugins.airbrake
 
 import groovy.transform.ToString
 import groovy.xml.MarkupBuilder
+import org.codehaus.groovy.grails.web.servlet.mvc.GrailsWebRequest
+import org.springframework.web.context.request.RequestContextHolder
 
 @ToString(includeNames = true)
 class Notice {
+
+    /**
+     * The throwable that caused this notice
+     */
+    Throwable throwable
+
     /**
      * The API Key for the project to send the notification for
      */
@@ -46,6 +54,11 @@ class Notice {
     String action
 
     /**
+     * A list of key names or regular expression use to filter parameters, session and cgiData
+     */
+    List<String> filteredKeys
+
+    /**
      * A Map of parameters for the web request the exception occurred in (from query string of post body)
      */
     Map params
@@ -71,7 +84,7 @@ class Notice {
     String appVersion
 
     /**
-     * The hostname of the machine where the exception occured
+     * The hostname of the machine where the exception occurred
      */
     String hostname
 
@@ -80,14 +93,71 @@ class Notice {
      */
     Map user
 
+    /**
+     * The name of the notifier sending this notice
+     */
+    String notifierName
+
+    /**
+     * The version of the notifier sending this notice
+     */
+    String notifierVersion
+
+    /**
+     * The url of the notifier sending this notice
+     */
+    String notifierUrl
+
+    /**
+     * Arguments supplied in the constructor, with defaults from the NoticeContextHolder
+     */
+    private final Map args
+
+    Notice(Map args =[:]) {
+        args = getArgsWithDefaults(args)
+        def webRequest = (GrailsWebRequest) RequestContextHolder.requestAttributes
+
+        this.args = args
+        this.throwable = args.throwable
+        this.apiKey = args.apiKey
+        this.projectRoot = args.projectRoot
+
+        this.notifierName = args.notifierName
+        this.notifierVersion = args.notifierVersion
+        this.notifierUrl = args.notifierUrl
+
+        this.filteredKeys = args.filteredKeys
+        this.params = args.params ?: webRequest?.parameterMap
+
+        this.url = args.url ?: constructUrl(webRequest)
+        this.component = args.component ?: args.controller ?: webRequest?.controllerName
+        this.action = args.action ?: webRequest?.actionName
+
+        this.env = args.env
+        this.cgiData = args.cgiData ?: getCgiData(webRequest)
+        this.session = args.session ?: getSessionData(webRequest)
+        this.backtrace = throwable?.stackTrace ?: args.backtrace
+        this.errorClass = throwable?.class?.name ?: args.errorClass
+        // Grails creates a really long error message for uncaught exceptions. Essentially a combination of all the webRequest meta data.
+        // However it creates very unhelpful messages for airbrake so we just prefer the simpler message on the throwable
+        // This means for exceptions logged by the app code like log.error(message, exception) that we ignore the supplied message.
+        // This is less than idea (we expect the user supplied message to be useful) but by the time the Appender has the details we
+        // cannot distinguish between the caught and uncaught cases.
+        this.errorMessage = throwable?.message ?: args.errorMessage
+        this.hostname = InetAddress.localHost.hostName
+        this.user = args.user
+
+        applyFilters()
+    }
+
     void toXml(Writer writer) {
         new MarkupBuilder(writer).notice(version: AirbrakeNotifier.AIRBRAKE_API_VERSION) {
             'api-key'(apiKey)
 
             'notifier' {
-                name(AirbrakeNotifier.NOTIFIER_NAME)
-                version(AirbrakeNotifier.NOTIFIER_VERSION)
-                url(AirbrakeNotifier.NOTIFIER_URL)
+                name(notifierName)
+                version(notifierVersion)
+                url(notifierUrl)
             }
 
             error {
@@ -144,6 +214,71 @@ class Notice {
                     }
                 }
             }
+        }
+    }
+
+    private Map getArgsWithDefaults(args) {
+        def argsWithDefaults = (Map)NoticeContextHolder.noticeContext?.clone() ?: [:]
+        if (args) {
+            argsWithDefaults << args
+        }
+        argsWithDefaults
+    }
+
+    private Map getCgiData(webRequest) {
+        def request = webRequest?.request
+        def data = [:]
+        request?.headerNames?.each { data[it] =  request.getHeader(it) }
+        data
+    }
+
+    private Map getSessionData(webRequest) {
+        def session = webRequest?.session
+        def data = [:]
+        session?.attributeNames?.each { data[it] = session.getAttribute(it) }
+        data
+    }
+
+    private String constructUrl(GrailsWebRequest webRequest) {
+        if (!webRequest) {
+            return
+        }
+        def request = webRequest.currentRequest
+        def origUrl = request.forwardURI
+
+        def urlPath = origUrl
+        if (request.queryString) {
+            urlPath += '?' + request.queryString
+        }
+
+        def defaultPort = request.scheme == 'https' ? 443 : 80
+
+        def url
+        if (defaultPort == request.serverPort) {
+            url = new URL(request.scheme, request.serverName, urlPath)
+        } else {
+            url = new URL(request.scheme, request.serverName, request.serverPort, urlPath)
+        }
+
+        url.toString()
+    }
+
+    private addSupplementerDetails() {
+        supplementers.each {
+            it.supplement(this)
+        }
+    }
+
+    private applyFilters() {
+        ['session', 'cgiData', 'params'].each {
+           setProperty(it, filterParameters(getProperty(it)) )
+        }
+    }
+
+    private Map filterParameters(Map params) {
+        params?.collectEntries { k, v ->
+            def filteredValue = filteredKeys?.any { k =~ it } ? "[FILTERED]" : v.toString()
+            [(k): filteredValue]
         }
     }
 }

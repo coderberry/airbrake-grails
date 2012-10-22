@@ -18,7 +18,7 @@ class AirbrakeServiceSpec extends Specification {
         service.notify('That rascally rabbit escaped', exception)
 
         then:
-        1 * service.airbrakeNotifier.notify('That rascally rabbit escaped', exception)
+        1 * service.airbrakeNotifier.notify(exception, [errorMessage: 'That rascally rabbit escaped'])
     }
 
     def 'notify has optional Throwable parameter'() {
@@ -26,10 +26,10 @@ class AirbrakeServiceSpec extends Specification {
         service.notify('That rascally rabbit escaped')
 
         then:
-        1 * service.airbrakeNotifier.notify('That rascally rabbit escaped', null)
+        1 * service.airbrakeNotifier.notify(null, [errorMessage: 'That rascally rabbit escaped'])
     }
 
-    // prove that the helper methods on the service are just pass throughs to the NoticeRequestContextHolder
+    // prove that the helper methods on the service are just pass through to the NoticeRequestContextHolder
     def 'set component, action, params'() {
         when:
         service.addNoticeContext('component', 'action', [one: 'two'])

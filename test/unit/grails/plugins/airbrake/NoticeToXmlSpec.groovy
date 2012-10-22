@@ -2,7 +2,7 @@ package grails.plugins.airbrake
 
 import spock.lang.*
 
-class NoticeSpec extends Specification {
+class NoticeToXmlSpec extends Specification {
 
     def 'serialize apiKey'() {
         given: 'a notice'
@@ -17,15 +17,15 @@ class NoticeSpec extends Specification {
 
     def 'should serialize the notifier data'() {
         given: 'a notice'
-        def notice = new Notice()
+        def notice = new Notice(notifierName: 'notifier', notifierUrl: 'http://my.notifier.com/about', notifierVersion: '0.1.2')
 
         when: 'we serialize'
         def xml = getXmlFromSerializer(notice)
 
         then:
-        xml.notifier.name.text() == AirbrakeNotifier.NOTIFIER_NAME
-        xml.notifier.version.text() == AirbrakeNotifier.NOTIFIER_VERSION
-        xml.notifier.url.text() == AirbrakeNotifier.NOTIFIER_URL
+        xml.notifier.name.text() == 'notifier'
+        xml.notifier.version.text() == '0.1.2'
+        xml.notifier.url.text() == 'http://my.notifier.com/about'
     }
 
     def 'serialize request params'() {
@@ -70,8 +70,7 @@ class NoticeSpec extends Specification {
     @Unroll
     def 'serialize #paramsMap'() {
         given: 'a notice'
-        def notice = new Notice()
-        notice."$paramsMap" = [ask: 'me', something: 'interesting']
+        def notice = new Notice((paramsMap): [ask: 'me', something: 'interesting'] )
 
         when: 'we serialize'
         def xml = getXmlFromSerializer(notice)
@@ -116,8 +115,7 @@ class NoticeSpec extends Specification {
     }
 
     def 'current-user'() {
-        def notice = new Notice()
-        notice.user = [id: '1234', name: 'Bugs Bunny', email: 'bugsbunny@acem.com', username: 'bugsbunny']
+        def notice = new Notice(user:  [id: '1234', name: 'Bugs Bunny', email: 'bugsbunny@acem.com', username: 'bugsbunny'])
 
         when: 'we serialize'
         def xml = getXmlFromSerializer(notice)

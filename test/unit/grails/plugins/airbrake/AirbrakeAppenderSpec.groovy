@@ -18,31 +18,17 @@ class AirbrakeAppenderSpec extends Specification {
     def 'append calls notifier if the loggingEvent has throwableInformation'() {
         given:
         def appender = new AirbrakeAppender(mockAirbrakeNotifier, false)
-        mockAirbrakeNotifier.enabled >> true
 
         when:
         appender.append(getLoggingEvent('That rascally rabbit escaped', exception))
 
         then:
-        1 * mockAirbrakeNotifier.notify('That rascally rabbit escaped', exception)
-    }
-
-    def 'append does not call notifier if its disabled'() {
-        given:
-        def appender = new AirbrakeAppender(mockAirbrakeNotifier, false)
-        mockAirbrakeNotifier.enabled >> false
-
-        when:
-        appender.append(getLoggingEvent('That rascally rabbit escaped', exception))
-
-        then:
-        0 * mockAirbrakeNotifier.notify(_, _)
+        1 * mockAirbrakeNotifier.notify(exception, [errorMessage: 'That rascally rabbit escaped'])
     }
 
     def 'append does not call notifier if the loggingEvent has no throwableInformation'() {
         given:
         def appender = new AirbrakeAppender(mockAirbrakeNotifier, false)
-        mockAirbrakeNotifier.enabled >> true
 
         when:
         appender.append(getLoggingEvent('That rascally rabbit escaped'))
@@ -54,13 +40,12 @@ class AirbrakeAppenderSpec extends Specification {
     def 'append calls notifier if the loggingEvent has no throwableInformation but includeEventsWithoutExceptions is true'() {
         given:
         def appender = new AirbrakeAppender(mockAirbrakeNotifier, true)
-        mockAirbrakeNotifier.enabled >> true
 
         when:
         appender.append(getLoggingEvent('That rascally rabbit escaped'))
 
         then:
-        1 * mockAirbrakeNotifier.notify('That rascally rabbit escaped', null)
+        1 * mockAirbrakeNotifier.notify(null, [errorMessage: 'That rascally rabbit escaped'])
     }
 
     private LoggingEvent getLoggingEvent(String errorMessage, Throwable throwable = null) {

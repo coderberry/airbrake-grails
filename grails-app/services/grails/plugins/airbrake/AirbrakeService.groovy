@@ -6,7 +6,7 @@ class AirbrakeService {
     AirbrakeNotifier airbrakeNotifier
 
     void notify(String errorMessage, Throwable throwable = null) {
-        airbrakeNotifier.notify(errorMessage, throwable)
+        airbrakeNotifier.notify(throwable, [errorMessage: errorMessage])
     }
 
     void addNoticeContext(String component, String action, Map params = [:]) {

@@ -128,9 +128,34 @@ Note: It might be reasonable to have this setting true by default but for backwa
 
 ### Custom Airbrake Host, Port and Scheme
 
+### Adding Custom Data to Error Notifications
+
 ### Supplying User Data
 
-### Adding Custom Data to Error Notifications
+Airbrake allows certain User data to be supplied with the notice. To set the current users data to be included in all notifications use the `airbrakeService.addNoticeContext` method to set a map of userData.
+The supported keys are `idz, `name`, `email` and `username`
+```groovy
+airbrakeService.addNoticeContext(id: '1234', name: 'Bugs Bunny', email: 'bugs@acme.com', username: 'bugs')
+```
+
+In most web apps the simplest way to provide this context is in a Grails filter. For example if you are using `SpringSecurity` add the following `AirbrakeFilter.groovy` in `grails-app/conf`
+```groovy
+class AirbrakeFilters {
+    def airbrakeService
+    def springSecurityService
+
+    def filters = {
+        all(uri: '/**') {
+            before = {
+                def user = springSecurityService.currentUser
+                if (user) {
+                   airbrakeService.addNoticeContext(user: [id: user.id, name: user.name, email: user.email, username: user.username ])
+                }
+            }
+        }
+    }
+}
+```
 
 ## Compatibility
 
@@ -156,7 +181,7 @@ This plugin is compatible with Grails version 2.0 or greater.
 	* Simpler api for providing user data
 	* Full class names in stacktrace. #11
 * 0.8.1 - 2012/10/19
-	* Better erorr message for uncaught exceptions. #18
+	* Better error message for uncaught exceptions. #18
 
 ## Contributing
 
@@ -169,4 +194,5 @@ This plugin is compatible with Grails version 2.0 or greater.
 
 # Kudos
 
-Most of the source code has been written by Phuong LeCong ([https://github.com/plecong/grails-airbrake](https://github.com/plecong/grails-airbrake)).
+The origin version of this plugin was written by Phuong LeCong ([https://github.com/plecong/grails-airbrake](https://github.com/plecong/grails-airbrake)).
+Since then it has undergone significant refactoring and updates inspired by the Ruby Airbrake gem ([https://github.com/airbrake/airbrake](https://github.com/airbrake/airbrake))

@@ -11,57 +11,34 @@ class AirbrakeNotifier {
 	static final String AIRBRAKE_PATH = '/notifier_api/v2/notices'
 
 	static final String NOTIFIER_NAME = 'grails-airbrake'
-	static final String NOTIFIER_VERSION = '0.1'
-	static final String NOTIFIER_URL = 'http://github.com/plecong/grails-airbrake'
+	static final String NOTIFIER_VERSION = '0.8.1'
+	static final String NOTIFIER_URL = 'https://github.com/cavneb/airbrake-grails'
 
-    String host
-    Integer port
-    boolean secure
-    boolean enabled
+    final Configuration configuration
 
 	private String path = AIRBRAKE_PATH
-    private GrailsNoticeBuilder grailsNoticeBuilder
 
     // mostly to make mocking easier in specs
     protected AirbrakeNotifier() {}
 
-    AirbrakeNotifier(
-            String apiKey,
-            String env,
-            List<String> filteredKeys,
-            String host,
-            Integer port,
-            boolean secure,
-            List<NoticeSupplementer> supplementers,
-            boolean enabled
-    ) {
-        this.host = host ?: AIRBRAKE_HOST
-        this.port = port ?: (secure ? 443 : 80)
-        this.secure = secure
-        this.enabled = enabled
-
-        grailsNoticeBuilder = new GrailsNoticeBuilder(apiKey, env, filteredKeys, supplementers)
+    AirbrakeNotifier(Configuration configuration) {
+        this.configuration = configuration
     }
 
-    /**
-     * A convenience for setting the userDataService after construction.
-     * Because of the Spring lifecycle we don't have access to the service in doWithSpring when we construct the airbrakeNotifier bean.
-     * Instead we have to wait until doWithApplicationContext to get the configured userDataService.
-     * @param userDataService
-     */
-    void addUserDataService(UserDataService userDataService) {
-        grailsNoticeBuilder.supplementers << new UserDataSupplementer(userDataService)
-    }
-
-    void notify(String errorMessage, Throwable throwable) {
-        if (enabled) {
-            // if we're not enabled don't go through the effort of building the message
-            doNotify(grailsNoticeBuilder.buildNotice(errorMessage, throwable))
+    void notify(Throwable throwable, Map options = [:]) {
+        // if we're not enabled don't go through the effort of building the message
+        if (configuration.enabled) {
+            options.throwable = throwable
+            send_notice(buildNotice(configuration.merge(options)))
         }
     }
 
-	private doNotify(Notice notice) {
-        if (!enabled) {
+    Notice buildNotice(Map options) {
+        new Notice(options)
+    }
+
+	void send_notice(Notice notice) {
+        if (!configuration.enabled) {
             return
         }
         if (!notice.apiKey) {
@@ -96,20 +73,13 @@ class AirbrakeNotifier {
 	}
 
     private HttpURLConnection buildConnection() {
-    	String protocol = secure ? 'https' : 'http'
-
-        URL apiURL = new URL(
-            protocol,
-            host,
-            port,
-            path
-        )
+        URL apiURL = new URL(configuration.scheme, configuration.host, configuration.port, path)
 
         HttpURLConnection conn = apiURL.openConnection()
         conn.setDoOutput(true)
         conn.setRequestProperty("Content-type", "text/xml")
         conn.setRequestProperty("Accept", "text/xml, application/xml")
         conn.setRequestMethod("POST")
-        return conn
+        conn
     }
 }
