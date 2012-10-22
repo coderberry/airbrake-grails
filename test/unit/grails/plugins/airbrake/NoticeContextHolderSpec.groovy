@@ -9,10 +9,10 @@ class NoticeContextHolderSpec extends Specification {
         NoticeContextHolder.addNoticeContext('component', 'action', [one: 'two'])
 
         then:
-        Request request = NoticeContextHolder.noticeContext
-        request.component == 'component'
-        request.action == 'action'
-        request.params == [one: 'two']
+        def context = NoticeContextHolder.noticeContext
+        context.component == 'component'
+        context.action == 'action'
+        context.params == [one: 'two']
     }
 
     def 'set request'() {

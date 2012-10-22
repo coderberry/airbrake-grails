@@ -20,7 +20,6 @@ class AirbrakeNotifier {
     boolean enabled
 
 	private String path = AIRBRAKE_PATH
-    private GroovyNoticeSerializer serializer = new GroovyNoticeSerializer()
     private GrailsNoticeBuilder grailsNoticeBuilder
 
     // mostly to make mocking easier in specs
@@ -77,7 +76,7 @@ class AirbrakeNotifier {
         try {
             conn = buildConnection()
             conn.outputStream.withWriter { outputWriter ->
-                serializer.toXml(notice, outputWriter)
+                notice.toXml(outputWriter)
             }
 
             responseCode = conn.responseCode

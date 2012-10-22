@@ -1,6 +1,7 @@
 package grails.plugins.airbrake
 
 import groovy.transform.ToString
+import groovy.xml.MarkupBuilder
 
 @ToString(includeNames = true)
 class Notice {
@@ -74,15 +75,76 @@ class Notice {
      */
     String hostname
 
+    /**
+     * The details of the current user. Supports id, name, email and username.
+     */
     Map user
+
+    void toXml(Writer writer) {
+        new MarkupBuilder(writer).notice(version: AirbrakeNotifier.AIRBRAKE_API_VERSION) {
+            'api-key'(apiKey)
+
+            'notifier' {
+                name(AirbrakeNotifier.NOTIFIER_NAME)
+                version(AirbrakeNotifier.NOTIFIER_VERSION)
+                url(AirbrakeNotifier.NOTIFIER_URL)
+            }
+
+            error {
+                'class'(errorClass)
+                message(errorMessage)
+                backtrace {
+                    backtrace.each {
+                        'line'(
+                                file: it.fileName,
+                                number: it.lineNumber,
+                                method: "${it.className}.${it.methodName}"
+                        )
+                    }
+                }
+            }
+
+            if (url || component || action || params || session || cgiData) {
+                request {
+                    url(url)
+                    component(component)
+                    action(action)
+
+                    [params: 'params', session: 'session', cgiData: 'cgi-data'].each { property, nodeName ->
+                        if ("$property") {
+                            "$nodeName" {
+                                getProperty(property).each { k, v ->
+                                    var(key: k, v)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            'server-environment' {
+                if (projectRoot) {
+                    'project-root'(projectRoot)
+                }
+
+                'environment-name'(env)
+
+                if (appVersion) {
+                    'app-version'(appVersion)
+                }
+                if (hostname) {
+                    hostname(hostname)
+                }
+            }
+
+            if (user) {
+                'current-user' {
+                    user.each {k, v ->
+                        "$k"(v)
+                    }
+                }
+            }
+        }
+    }
 }
 
-@ToString(includeNames = true)
-class Request {
-	String url
-	String component
-	String action
-	Map params
-	Map session
-	Map cgiData
-}

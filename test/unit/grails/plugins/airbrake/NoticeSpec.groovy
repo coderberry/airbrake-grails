@@ -2,9 +2,7 @@ package grails.plugins.airbrake
 
 import spock.lang.*
 
-class GroovyNoticeSerializerSpec extends Specification {
-
-    def serializer = new GroovyNoticeSerializer()
+class NoticeSpec extends Specification {
 
     def 'serialize apiKey'() {
         given: 'a notice'
@@ -131,9 +129,9 @@ class GroovyNoticeSerializerSpec extends Specification {
         xml.'current-user'.username.text() == 'bugsbunny'
     }
 
-    private getXmlFromSerializer(def notice) {
+    private getXmlFromSerializer(Notice notice) {
         StringWriter writer = new StringWriter()
-        serializer.toXml( notice, writer)
+        notice.toXml(writer)
         new XmlParser().parseText(writer.toString())
     }
 }
