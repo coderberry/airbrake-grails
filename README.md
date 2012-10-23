@@ -41,7 +41,7 @@ class SomeController
 
 ### AirbakeService
 
-The plugin also exposes an `airbrakeService` which can be dependency injected into your Grails classes. The service allows you to send error notifications directly to Airbrake without logging anything to log4j. It has a single `notify` method that takes a `String` error message and an optional `Throwable` parameter. The next example shows both in use:
+The plugin also exposes an `airbrakeService` which can be dependency injected into your Grails classes. The service allows you to send error notifications directly to Airbrake without logging anything to log4j. It has a `notify` method that takes a `Throwable` parameter and an optional Map of arguemnts. The next example shows both in use:
 
 ```groovy
 class SomeController
@@ -51,13 +51,13 @@ class SomeController
 		try {
 			somethingThatThrowsAnException()
 		} catch(e) {
-			airbrakeService.notify('An error occurred', e)
+			airbrakeService.notify(e, [errorMessage: 'An error occurred'])
 		}
 	}
 
 	def anotherAction() {
 		if (somethingWentWrong()) {
-			airbrakeService.notify('Something went wrong')
+			airbrakeService.notify(null, [errorMessage: 'Something went wrong'])
 		}
 	}
 ```
