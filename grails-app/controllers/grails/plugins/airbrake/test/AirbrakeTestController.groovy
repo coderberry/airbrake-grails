@@ -28,12 +28,12 @@ class AirbrakeTestController {
     def trappedException(String message) {
         def realMessage = message ?: "TrappedException"
         def exception = new Exception("${realMessage} ${System.currentTimeMillis()}")
-        airbrakeService.notify(null, exception)
+        airbrakeService.notify(exception)
     }
 
     def errorMessage(String message) {
         def realMessage = message ?: "ErrorMessage"
-        airbrakeService.notify("${realMessage} ${System.currentTimeMillis()}")
+        airbrakeService.notify(null, [errorMessage: "${realMessage} ${System.currentTimeMillis()}"])
     }
 
     def customContext(String message, String customComponent, String customAction) {
@@ -42,6 +42,6 @@ class AirbrakeTestController {
         customAction = customAction ?: 'CustomAction'
         def time = System.currentTimeMillis()
         airbrakeService.addNoticeContext(customComponent, customAction, [time: time])
-        airbrakeService.notify("${message} ${time}")
+        airbrakeService.notify(null, [errorMessage: "${message} ${time}"])
     }
 }

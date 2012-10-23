@@ -12,7 +12,7 @@ class AirbrakeGrailsPlugin {
             "grails-app/conf/**",
             "grails-app/views/**",
             "grails-app/controllers/**",
-            "grails-app/services/test/**",
+            "grails-app/jobs/**",
             "test/**",
             "web-app/**"
     ]
@@ -33,7 +33,9 @@ class AirbrakeGrailsPlugin {
 
         def configuration = new Configuration(application.config.grails.plugins.airbrake.clone())
 
-        airbrakeNotifier(AirbrakeNotifier, configuration)
+        airbrakeNotifier(AirbrakeNotifier, configuration) { bean ->
+            bean.autowire = "byName"
+        }
 
         airbrakeAppender(AirbrakeAppender, ref('airbrakeNotifier'), configuration.includeEventsWithoutExceptions)
     }

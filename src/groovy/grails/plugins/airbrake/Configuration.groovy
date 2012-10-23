@@ -14,6 +14,7 @@ class Configuration {
     String host = AirbrakeNotifier.AIRBRAKE_HOST
     Integer port
     boolean includeEventsWithoutExceptions = false
+    Closure async
 
     Configuration(Map options) {
         // reimplement the map constructor so we can set the port afterwards
@@ -23,6 +24,9 @@ class Configuration {
 
     Map merge(Map options) {
         def merge = properties
+        merge.remove 'async'
+        merge.remove 'class'
+        merge.remove 'metaClass'
         merge << options
         merge
     }

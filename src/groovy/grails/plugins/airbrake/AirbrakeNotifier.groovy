@@ -6,6 +6,8 @@ import groovy.util.logging.Log4j
 @ToString(includeNames=true)
 @Log4j
 class AirbrakeNotifier {
+    def grailsApplication
+
     static final String AIRBRAKE_API_VERSION = '2.2'
 	static final String AIRBRAKE_HOST = 'airbrakeapp.com'
 	static final String AIRBRAKE_PATH = '/notifier_api/v2/notices'
@@ -29,21 +31,30 @@ class AirbrakeNotifier {
         // if we're not enabled don't go through the effort of building the message
         if (configuration.enabled) {
             options.throwable = throwable
-            send_notice(buildNotice(configuration.merge(options)))
+            sendNotice(buildNotice(options))
         }
     }
 
     Notice buildNotice(Map options) {
-        new Notice(options)
+        new Notice(configuration.merge(options))
     }
 
-	void send_notice(Notice notice) {
+	void sendNotice(Notice notice) {
+        if (configuration.async) {
+            configuration.async(notice, grailsApplication)
+        } else {
+            sendToAirbrake(notice)
+        }
+	}
+
+    def sendToAirbrake(Notice notice) {
         if (!configuration.enabled) {
             return
         }
         if (!notice.apiKey) {
             throw new RuntimeException("The API key for the project this error is from is required. Get this from the project's page in airbrake.")
         }
+
         log.debug "Sending Notice ${notice} to airbrake"
 
         HttpURLConnection conn
@@ -61,16 +72,14 @@ class AirbrakeNotifier {
             if (responseCode < 200 || responseCode >= 300) {
                 System.err.println("${responseCode}: ${responseMessage}, ${notice}")
             }
-
-
-        } catch(e) {
+        } catch (e) {
             System.err.println "Error sending Notice ${notice} to Airbrake. Exception: ${e}"
         }
         finally {
             if (conn)
                 conn.disconnect()
         }
-	}
+    }
 
     private HttpURLConnection buildConnection() {
         URL apiURL = new URL(configuration.scheme, configuration.host, configuration.port, path)

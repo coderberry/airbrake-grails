@@ -74,8 +74,7 @@ grails.plugins.airbrake.filteredKeys
 grails.plugins.airbrake.host
 grails.plugins.airbrake.port
 grails.plugins.airbrake.secure
-grails.plugins.airbrake.userDataService
-grails.plugins.airbrake.supplementers
+grails.plugins.airbrake.async
 ```
 
 ### Enabling/Disabling notifications
@@ -133,7 +132,7 @@ Note: It might be reasonable to have this setting true by default but for backwa
 ### Supplying User Data
 
 Airbrake allows certain User data to be supplied with the notice. To set the current users data to be included in all notifications use the `airbrakeService.addNoticeContext` method to set a map of userData.
-The supported keys are `idz, `name`, `email` and `username`
+The supported keys are `id`, `name`, `email` and `username`
 ```groovy
 airbrakeService.addNoticeContext(id: '1234', name: 'Bugs Bunny', email: 'bugs@acme.com', username: 'bugs')
 ```
@@ -152,6 +151,36 @@ class AirbrakeFilters {
                    airbrakeService.addNoticeContext(user: [id: user.id, name: user.name, email: user.email, username: user.username ])
                 }
             }
+        }
+    }
+}
+```
+
+## Asynchronous notifications
+Sending notifications to Airbrake can introduce a considerable latency to your application. To solve this problem use the async configuration option.
+This configuration takes a closure with two parameters the `Notice` to send and the `grailsApplication`. The asynchronous handler should simply call `airbrakeService.sendNotice(notice)` to deliver the notification.
+
+This plugin does not introduce a default choice for processing notices asynchronously. You should choose a method that suits your application.
+You could just create a new thread or use a scheduler/queuing plugin such as [Quartz](http://grails.org/plugin/quartz) or [Jesque](http://grails.org/plugin/jesque)
+
+For example if you are using the Quartz plugin you can send notifications asynchronously using the following setting in `Config.groovy`
+
+```groovy
+grails.plugins.airbrake.async = { notice, grailsApplication ->
+    AirbrakeNotifyJob.triggerNow(notice: notice)
+}
+```
+
+and the `AirbrakeNotifyJob` is defined in `grails-app\jobs` something like this:
+
+```groovy
+class AirbrakeNotifyJob {
+    def airbrakeService
+
+    def execute(JobExecutionContext context) {
+        Notice notice = context.mergedJobDataMap.notice
+        if (notice) {
+            airbrakeService.sendNotice(notice)
         }
     }
 }

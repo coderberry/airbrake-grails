@@ -15,15 +15,15 @@ class AirbrakeServiceSpec extends Specification {
         def exception = new RuntimeException('Damn that Rabbit')
 
         when:
-        service.notify('That rascally rabbit escaped', exception)
+        service.notify(exception, [errorMessage: 'That rascally rabbit escaped'])
 
         then:
         1 * service.airbrakeNotifier.notify(exception, [errorMessage: 'That rascally rabbit escaped'])
     }
 
-    def 'notify has optional Throwable parameter'() {
+    def 'notify without throwable parameter'() {
         when:
-        service.notify('That rascally rabbit escaped')
+        service.notify(null, [errorMessage: 'That rascally rabbit escaped'])
 
         then:
         1 * service.airbrakeNotifier.notify(null, [errorMessage: 'That rascally rabbit escaped'])
@@ -50,6 +50,28 @@ class AirbrakeServiceSpec extends Specification {
 
         then:
         NoticeContextHolder.noticeContext == [some: 'param']
+    }
+
+    def 'clearNoticeContext'() {
+        given:
+        def context = [some: 'param']
+        service.addNoticeContext(context)
+
+        when:
+        service.clearNoticeContext()
+
+        then:
+        NoticeContextHolder.noticeContext == null
+    }
+
+    def 'sendToAirbrake'() {
+        given:
+        def notice = new Notice()
+        when:
+        service.sendToAirbrake(notice)
+
+        then:
+        1 * service.airbrakeNotifier.sendToAirbrake(notice)
     }
 
     def cleanup() {
