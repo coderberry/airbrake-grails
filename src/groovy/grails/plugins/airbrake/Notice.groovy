@@ -36,7 +36,7 @@ class Notice {
     /**
      * the backtrace for the exception
      */
-    StackTraceElement[] backtrace
+    Backtrace[] backtrace
 
     /**
      * the url of the web request that generated the exception (if any)
@@ -136,7 +136,7 @@ class Notice {
         this.env = args.env
         this.cgiData = args.cgiData ?: getCgiData(webRequest)
         this.session = args.session ?: getSessionData(webRequest)
-        this.backtrace = throwable?.stackTrace ?: args.backtrace
+        this.backtrace = parseBacktrace(throwable?.stackTrace ?: args.backtrace)
         this.errorClass = throwable?.class?.name ?: args.errorClass
         // Grails creates a really long error message for uncaught exceptions. Essentially a combination of all the webRequest meta data.
         // However it creates very unhelpful messages for airbrake so we just prefer the simpler message on the throwable
@@ -144,7 +144,7 @@ class Notice {
         // This is less than idea (we expect the user supplied message to be useful) but by the time the Appender has the details we
         // cannot distinguish between the caught and uncaught cases.
         this.errorMessage = throwable?.message ?: args.errorMessage
-        this.hostname = InetAddress.localHost.hostName
+        this.hostname = args.hostname ?: InetAddress.localHost.hostName
         this.user = args.user
 
         applyFilters()
@@ -215,6 +215,39 @@ class Notice {
                 }
             }
         }
+    }
+
+    /**
+     * Coverts the Notice to a Map or primitives (Maps, Lists and basic types)
+     * Extremely useful if you want to serialize the Notice as we can serialize the map and then call the
+     * constructor after deserialization and get the same Notice
+     * @return a Map representing this Notice
+     */
+    Map toMap() {
+        [
+            apiKey: apiKey,
+            projectRoot: projectRoot,
+            notifierName: notifierName,
+            notifierVersion: notifierVersion,
+            notifierUrl: notifierUrl,
+            filteredKeys: filteredKeys,
+            url: url,
+            component: component,
+            action: action,
+            params: params,
+            env: env,
+            cgiData: cgiData,
+            session: session,
+            backtrace: backtrace*.toMap().toArray(),
+            errorClass: errorClass,
+            errorMessage: errorMessage,
+            hostname: hostname,
+            user: user
+        ]
+    }
+
+    private Backtrace[] parseBacktrace(backtrace) {
+        backtrace.collect { new Backtrace(it) }.toArray()
     }
 
     private Map getArgsWithDefaults(args) {

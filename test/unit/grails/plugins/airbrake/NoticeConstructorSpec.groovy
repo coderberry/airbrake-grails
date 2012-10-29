@@ -311,9 +311,9 @@ class NoticeConstructorSpec extends Specification {
 
         where:
         exception                                             | backtrace      || expectedBacktrace
-        new RuntimeException(stackTrace: exceptionStackTrace) | argsStackTrace || exceptionStackTrace
-        null                                                  | argsStackTrace || argsStackTrace
-        null                                                  | null           || null
+        new RuntimeException(stackTrace: exceptionStackTrace) | argsStackTrace || exceptionBacktrace
+        null                                                  | argsStackTrace || argsBacktrace
+        null                                                  | null           || []
     }
 
     private getExceptionStackTrace() {
@@ -324,13 +324,37 @@ class NoticeConstructorSpec extends Specification {
         [new StackTraceElement('com.acme.RabbitTrapsController', 'net', 'RabbitTrapsController.groovy', 5 )]
     }
 
+    private getExceptionBacktrace() {
+        [new Backtrace('com.acme.RabbitTraps', 'catch', 'RabbitTraps.groovy', 10 )]
+    }
+
+    private getArgsBacktrace() {
+        [new Backtrace('com.acme.RabbitTrapsController', 'net', 'RabbitTrapsController.groovy', 5 )]
+    }
+
+    @Unroll
+    def 'backtrace parsed from a list of maps as the  backtrace argument'() {
+        when:
+        def backtraceMaps = [
+            [className: 'com.acme.RabbitTraps', methodName: 'catch', fileName: 'RabbitTraps.groovy', lineNumber: 10],
+            [className: 'com.acme.RabbitTrapsController', methodName: 'net', fileName: 'RabbitTrapsController.groovy', lineNumber: 5]
+        ]
+        def notice = new Notice(backtrace: backtraceMaps)
+
+        then:
+        notice.backtrace == [
+            new Backtrace('com.acme.RabbitTraps', 'catch', 'RabbitTraps.groovy', 10 ),
+            new Backtrace('com.acme.RabbitTrapsController', 'net', 'RabbitTrapsController.groovy', 5 )
+        ]
+    }
+
     def 'constructor creates a Notice with the right error message'() {
         when:
         def notice = new Notice(errorMessage: 'That rascally rabbit escaped')
 
         then:
         notice.errorMessage == 'That rascally rabbit escaped'
-        notice.backtrace == null
+        notice.backtrace == []
         notice.errorClass == null
     }
 
@@ -346,7 +370,7 @@ class NoticeConstructorSpec extends Specification {
         then:
         notice.errorMessage == 'That rascally rabbit escaped'
         notice.errorClass == 'java.lang.RuntimeException'
-        notice.backtrace == stackTrace
+        notice.backtrace == [new Backtrace('com.acme.RabbitTraps', 'catch', 'RabbitTraps.groovy', 10 )]
     }
 
     def 'constructor creates a Notice with the the exception message rather than supplied message'() {
