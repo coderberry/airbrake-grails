@@ -2,6 +2,8 @@ package grails.plugins.airbrake
 
 import groovy.transform.ToString
 import groovy.xml.MarkupBuilder
+import org.codehaus.groovy.grails.exceptions.DefaultStackTraceFilterer
+import org.codehaus.groovy.grails.exceptions.StackTraceFilterer
 import org.codehaus.groovy.grails.web.servlet.mvc.GrailsWebRequest
 import org.springframework.web.context.request.RequestContextHolder
 
@@ -113,12 +115,14 @@ class Notice {
      */
     private final Map args
 
+    private StackTraceFilterer stackTraceFilterer = new DefaultStackTraceFilterer()
+
     Notice(Map args =[:]) {
         args = getArgsWithDefaults(args)
         def webRequest = (GrailsWebRequest) RequestContextHolder.requestAttributes
 
         this.args = args
-        this.throwable = args.throwable
+        this.throwable = filterStackTrace(args.throwable)
         this.apiKey = args.apiKey
         this.projectRoot = args.projectRoot
 
@@ -148,6 +152,11 @@ class Notice {
         this.user = args.user
 
         applyFilters()
+    }
+
+
+    private Throwable filterStackTrace(Throwable unfilteredThrowable) {
+        unfilteredThrowable ? stackTraceFilterer.filter(unfilteredThrowable) : unfilteredThrowable
     }
 
     void toXml(Writer writer) {

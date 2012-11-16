@@ -40,9 +40,9 @@ class ConfigruationSpec extends Specification {
         true   || 'https'
     }
 
-    def 'merge does not include async, class or metaClass'() {
+    def 'merge does not include class or metaClass'() {
         given:
-        def configuration = new Configuration(env: 'production', async: { 'do something'} )
+        def configuration = new Configuration(env: 'production')
 
         when:
         def merge = configuration.merge(component: 'customComponent')
@@ -51,7 +51,6 @@ class ConfigruationSpec extends Specification {
         merge.env == 'production'
         merge.component == 'customComponent'
         merge.metaClass == null
-        merge.async == null
         merge.class == null
     }
 }
