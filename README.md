@@ -75,6 +75,7 @@ grails.plugins.airbrake.host
 grails.plugins.airbrake.port
 grails.plugins.airbrake.secure
 grails.plugins.airbrake.async
+grails.plugins.airbrake.threads
 ```
 
 ### Enabling/Disabling notifications
@@ -166,7 +167,7 @@ grails.plugins.airbrake.threads = 2
 
 ## Compatibility
 
-This plugin is compatible with Grails version 2.0 or greater.
+This plugin is compatible with Grails version 2.0 or greater. A backport to Grails 1.3 is available on the [grails-1.3 branch] (https://github.com/cavneb/airbrake-grails/tree/grails-1.3).
 
 ## Release Notes
 
