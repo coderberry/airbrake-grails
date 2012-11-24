@@ -75,7 +75,6 @@ grails.plugins.airbrake.host
 grails.plugins.airbrake.port
 grails.plugins.airbrake.secure
 grails.plugins.airbrake.async
-grails.plugins.airbrake.threads
 ```
 
 ### Enabling/Disabling notifications
@@ -157,17 +156,43 @@ class AirbrakeFilters {
 }
 ```
 
-## Asynchronous Notifications
-Notifications are sent to Airbrake Asynchronously using a fixed-size thread pool. By default this pool has a maximum
-size of 5, but this can be changed with the config parameter
+## Asynchronous notifications
+Sending notifications to Airbrake can introduce a considerable latency to your application. To solve this problem use the async configuration option.
+This configuration takes a closure with two parameters the `Notice` to send and the `grailsApplication`. The asynchronous handler should simply call `airbrakeService.sendNotice(notice)` to deliver the notification.
 
-````groovy
-grails.plugins.airbrake.threads = 2
-````
+This plugin does not introduce a default choice for processing notices asynchronously. You should choose a method that suits your application.
+You could just create a new thread or use a scheduler/queuing plugin such as [Quartz](http://grails.org/plugin/quartz) or [Jesque](http://grails.org/plugin/jesque)
+
+For example if you are using the Quartz plugin you can send notifications asynchronously using the following setting in `Config.groovy`
+
+```groovy
+grails.plugins.airbrake.async = { notice, grailsApplication ->
+    AirbrakeNotifyJob.triggerNow(notice: notice)
+}
+```
+
+and the `AirbrakeNotifyJob` is defined in `grails-app\jobs` something like this:
+
+```groovy
+class AirbrakeNotifyJob {
+    def airbrakeService
+
+    def execute(JobExecutionContext context) {
+        Notice notice = context.mergedJobDataMap.notice
+        if (notice) {
+            airbrakeService.sendNotice(notice)
+        }
+    }
+}
+```
 
 ## Compatibility
 
-This plugin is compatible with Grails version 2.0 or greater. A backport to Grails 1.3 is available on the [grails-1.3 branch] (https://github.com/cavneb/airbrake-grails/tree/grails-1.3).
+This plugin is compatible with Grails version 2.0 or greater.
+
+## TODO
+
+* Support stacktrace filtering
 
 ## Release Notes
 
@@ -191,11 +216,6 @@ This plugin is compatible with Grails version 2.0 or greater. A backport to Grai
     * Added method to AirbrakeService set notification context information that will be used for any reported errors
     * Simpler api to provide User Data. No need to implement UserDataService instead just set the context. (Breaking Change)
     * All request headers now included when reporting an error.
-* 0.9.5 - 2012/11/16
-    * Notifications sent to Airbrake asynchronously by default using a thread pool of configurable size #20
-    * Stack traces are filtered #19
-    * Upgraded to Grails 2.1.1
-    * XML message is logged at debug level
 
 ## Contributing
 
