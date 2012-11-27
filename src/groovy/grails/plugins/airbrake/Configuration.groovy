@@ -14,6 +14,7 @@ class Configuration {
     String host = AirbrakeNotifier.AIRBRAKE_HOST
     Integer port
     boolean includeEventsWithoutExceptions = false
+    def asyncThreadPoolSize = 5
     Closure async
 
     Configuration(Map options) {
