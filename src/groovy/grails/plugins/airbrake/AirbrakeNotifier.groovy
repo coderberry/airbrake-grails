@@ -94,15 +94,14 @@ class AirbrakeNotifier {
 
             if (threadPool) {
                 // send asynchronously
-                threadPool.submit(noticeSubmitter).get()
+                threadPool.submit(noticeSubmitter)
             } else {
                 // send synchronously
                 noticeSubmitter.run()
             }
         } catch (e) {
             System.err.println "Error sending Notice ${notice} to Airbrake. Exception: ${e}"
-        }
-        finally {
+        } finally {
             conn?.disconnect()
         }
     }
