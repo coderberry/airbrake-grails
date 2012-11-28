@@ -75,6 +75,7 @@ grails.plugins.airbrake.host
 grails.plugins.airbrake.port
 grails.plugins.airbrake.secure
 grails.plugins.airbrake.async
+grails.plugins.airbrake.asyncThreadPoolSize
 ```
 
 ### Enabling/Disabling notifications
@@ -156,8 +157,25 @@ class AirbrakeFilters {
 }
 ```
 
-## Asynchronous notifications
-Sending notifications to Airbrake can introduce a considerable latency to your application. To solve this problem use the async configuration option.
+## Synchronous/Asynchronous notifications
+
+By default, notifications are sent to Airbrake synchronously using a thread-pool of size 5. To change the size of this thread
+pool set the following config parameter:
+
+````groovy
+// double the size of the pool
+grails.plugins.airbrake.asyncThreadPoolSize = 10
+````
+
+To have the notifications sent synchronously, set this parameter to false:
+
+````groovy
+// send notifications synchronously
+grails.plugins.airbrake.asyncThreadPoolSize = false
+````
+
+### Custom Asynchronous Handler
+To send the notifications asynchronously using a custom handler, use the async configuration option.
 This configuration takes a closure with two parameters the `Notice` to send and the `grailsApplication`. The asynchronous handler should simply call `airbrakeService.sendNotice(notice)` to deliver the notification.
 
 This plugin does not introduce a default choice for processing notices asynchronously. You should choose a method that suits your application.
@@ -188,11 +206,7 @@ class AirbrakeNotifyJob {
 
 ## Compatibility
 
-This plugin is compatible with Grails version 2.0 or greater.
-
-## TODO
-
-* Support stacktrace filtering
+This plugin is compatible with Grails version 2.0 or greater. A backport to Grails 1.3 is available on the [grails-1.3 branch] (https://github.com/cavneb/airbrake-grails/tree/grails-1.3).
 
 ## Release Notes
 
@@ -216,6 +230,11 @@ This plugin is compatible with Grails version 2.0 or greater.
     * Added method to AirbrakeService set notification context information that will be used for any reported errors
     * Simpler api to provide User Data. No need to implement UserDataService instead just set the context. (Breaking Change)
     * All request headers now included when reporting an error.
+* 0.9.1 - 2012/11/24
+    * Notifications sent to Airbrake asynchronously by default using a thread pool of configurable size #20
+    * Stack traces are filtered #19
+    * Upgraded to Grails 2.1.1
+    * XML message is logged at debug level
 
 ## Contributing
 
