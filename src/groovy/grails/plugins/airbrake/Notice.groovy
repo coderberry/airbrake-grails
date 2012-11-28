@@ -115,14 +115,12 @@ class Notice {
      */
     private final Map args
 
-    private StackTraceFilterer stackTraceFilterer = new DefaultStackTraceFilterer()
-
     Notice(Map args =[:]) {
         args = getArgsWithDefaults(args)
         def webRequest = (GrailsWebRequest) RequestContextHolder.requestAttributes
 
         this.args = args
-        this.throwable = filterStackTrace(args.throwable)
+        this.throwable = filterStackTrace(args.throwable, args.stackTraceFilterer)
         this.apiKey = args.apiKey
         this.projectRoot = args.projectRoot
 
@@ -154,8 +152,8 @@ class Notice {
         applyFilters()
     }
 
-    private Throwable filterStackTrace(Throwable unfilteredThrowable) {
-        unfilteredThrowable ? stackTraceFilterer.filter(unfilteredThrowable) : unfilteredThrowable
+    private Throwable filterStackTrace(Throwable unfilteredThrowable, StackTraceFilterer stackTraceFilterer) {
+        unfilteredThrowable && stackTraceFilterer ? stackTraceFilterer.filter(unfilteredThrowable) : unfilteredThrowable
     }
 
     void toXml(Writer writer) {

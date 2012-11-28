@@ -1,6 +1,7 @@
 package grails.plugins.airbrake
 
 import spock.lang.*
+import org.codehaus.groovy.grails.exceptions.DefaultStackTraceFilterer
 
 class ConfigruationSpec extends Specification {
 
@@ -38,6 +39,11 @@ class ConfigruationSpec extends Specification {
         secure || scheme
         false  || 'http'
         true   || 'https'
+    }
+
+    def 'stackTraceFilterer defaults to DefaultStackTraceFilterer'() {
+        expect:
+        new Configuration().stackTraceFilterer instanceof DefaultStackTraceFilterer
     }
 
     def 'merge does not include async, class or metaClass'() {

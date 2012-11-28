@@ -76,6 +76,7 @@ grails.plugins.airbrake.port
 grails.plugins.airbrake.secure
 grails.plugins.airbrake.async
 grails.plugins.airbrake.asyncThreadPoolSize
+grails.plugins.airbrake.stackTraceFilterer
 ```
 
 ### Enabling/Disabling notifications
@@ -204,6 +205,14 @@ class AirbrakeNotifyJob {
 }
 ```
 
+### Stack Trace Filtering
+By default all stack traces are filtered using an instance of `org.codehaus.groovy.grails.exceptions.DefaultStackTraceFilterer` to remove common Grails and java packages.
+To provide custom stack trace filtering simple configure an instance of a class that implements the interface `org.codehaus.groovy.grails.exceptions.StackTraceFilterer` in `Config.groovy`
+
+```groovy
+grails.plugins.airbrake.stackTraceFilterer = new MyCustomStackTraceFilterer()
+```
+
 ## Compatibility
 
 This plugin is compatible with Grails version 2.0 or greater. A backport to Grails 1.3 is available on the [grails-1.3 branch] (https://github.com/cavneb/airbrake-grails/tree/grails-1.3).
@@ -230,14 +239,12 @@ This plugin is compatible with Grails version 2.0 or greater. A backport to Grai
     * Added method to AirbrakeService set notification context information that will be used for any reported errors
     * Simpler api to provide User Data. No need to implement UserDataService instead just set the context. (Breaking Change)
     * All request headers now included when reporting an error.
-* 0.9.1 - 2012/11/24
+* 0.9.1 - TBD
     * Notifications sent to Airbrake asynchronously by default using a thread pool of configurable size #20
-    * Stack traces are filtered #19
-    * Upgraded to Grails 2.1.1
-    * XML message is logged at debug level
+    * By default stack traces are filtered #19
+    * New configuration option to support custom stack trace filtering
 
 ## Contributing
-
 
 1. Fork it
 2. Create your feature branch (`git checkout -b my-new-feature`)

@@ -9,6 +9,7 @@ import spock.lang.Specification
 import spock.lang.Unroll
 import org.springframework.web.context.request.RequestContextHolder
 import org.codehaus.groovy.grails.web.servlet.mvc.GrailsWebRequest
+import org.codehaus.groovy.grails.exceptions.DefaultStackTraceFilterer
 
 @TestMixin(GrailsUnitTestMixin)
 class NoticeConstructorSpec extends Specification {
@@ -314,6 +315,41 @@ class NoticeConstructorSpec extends Specification {
         new RuntimeException(stackTrace: exceptionStackTrace) | argsStackTrace || exceptionBacktrace
         null                                                  | argsStackTrace || argsBacktrace
         null                                                  | null           || []
+    }
+
+    def 'constructor filters the stackTrace'() {
+        given:
+        def exception = new RuntimeException('Damn that Rabbit')
+        def anyStackTraceFilter = GroovySpy(DefaultStackTraceFilterer, global: true)
+
+        when:
+        new Notice(throwable: exception, stackTraceFilterer: new DefaultStackTraceFilterer())
+
+        then:
+        1 * anyStackTraceFilter.filter(exception)
+    }
+
+    def 'constructor should not try to filter the stackTrace of a null throwable'() {
+        given:
+        def anyStackTraceFilter = GroovySpy(DefaultStackTraceFilterer, global: true)
+
+        when:
+        new Notice(throwable: null)
+
+        then:
+        0 * anyStackTraceFilter.filter(_)
+    }
+
+    def 'constructor should not try to filter the stackTrace of a null stackTraceFilterer'() {
+        given:
+        def exception = new RuntimeException('Damn that Rabbit')
+        def anyStackTraceFilter = GroovySpy(DefaultStackTraceFilterer, global: true)
+
+        when:
+        new Notice(throwable: exception)
+
+        then:
+        0 * anyStackTraceFilter.filter(_)
     }
 
     private getExceptionStackTrace() {
