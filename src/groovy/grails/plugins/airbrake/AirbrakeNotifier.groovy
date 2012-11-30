@@ -2,8 +2,6 @@ package grails.plugins.airbrake
 
 import groovy.transform.ToString
 import groovy.util.logging.Log4j
-import java.util.concurrent.*
-import javax.annotation.PreDestroy
 
 @ToString(includeNames=true)
 @Log4j
@@ -19,7 +17,6 @@ class AirbrakeNotifier {
 	static final String NOTIFIER_URL = 'https://github.com/cavneb/airbrake-grails'
 
     final Configuration configuration
-    private final ExecutorService threadPool
 
 	private String path = AIRBRAKE_PATH
 
@@ -28,10 +25,6 @@ class AirbrakeNotifier {
 
     AirbrakeNotifier(Configuration configuration) {
         this.configuration = configuration
-
-        if (configuration.asyncThreadPoolSize) {
-            threadPool = Executors.newFixedThreadPool(configuration.asyncThreadPoolSize)
-        }
     }
 
     void notify(Throwable throwable, Map options = [:]) {
@@ -67,37 +60,27 @@ class AirbrakeNotifier {
         HttpURLConnection conn
 
         try {
-            Runnable noticeSubmitter = {
-                conn = buildConnection()
+            conn = buildConnection()
 
-                if (log.debugEnabled) {
-                    log.debug "Sending notice data to ${conn.getURL()}"
+            if (log.debugEnabled) {
+                log.debug "Sending notice data to ${conn.getURL()}"
 
-                    def stringWriter = new StringWriter()
-                    notice.toXml(stringWriter)
-                    log.debug "$stringWriter"
-                }
+                def stringWriter = new StringWriter()
+                notice.toXml(stringWriter)
+                log.debug "$stringWriter"
+            }
 
-                conn.outputStream.withWriter { outputWriter ->
-                    notice.toXml(outputWriter)
-                }
+            conn.outputStream.withWriter { outputWriter ->
+                notice.toXml(outputWriter)
+            }
 
-                int responseCode = conn.responseCode
-                String responseMessage = conn.responseMessage
+            int responseCode = conn.responseCode
+            String responseMessage = conn.responseMessage
 
-                if (responseCode in 200..<300) {
-                    log.debug "Received successful HTTP response $responseCode"
-                } else {
-                    System.err.println("HTTP Response ${responseCode}: ${responseMessage}. Failed to send: ${notice}")
-                }
-            } as Runnable
-
-            if (threadPool) {
-                // send asynchronously
-                threadPool.submit(noticeSubmitter)
+            if (responseCode in 200..<300) {
+                log.debug "Received successful HTTP response $responseCode"
             } else {
-                // send synchronously
-                noticeSubmitter.run()
+                System.err.println("HTTP Response ${responseCode}: ${responseMessage}. Failed to send: ${notice}")
             }
         } catch (e) {
             System.err.println "Error sending Notice ${notice} to Airbrake. Exception: ${e}"
@@ -115,10 +98,5 @@ class AirbrakeNotifier {
         conn.setRequestProperty("Accept", "text/xml, application/xml")
         conn.setRequestMethod("POST")
         conn
-    }
-
-    @PreDestroy
-    void shutdownThreadPool() {
-        threadPool?.shutdown()
     }
 }
