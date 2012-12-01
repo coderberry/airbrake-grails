@@ -15,7 +15,9 @@ class Configuration {
     String notifierVersion = AirbrakeNotifier.NOTIFIER_VERSION
     String env = Environment.current.name
     String apiKey
-    List<String> filteredKeys = []
+    List<String> paramsFilteredKeys = []
+    List<String> sessionFilteredKeys = []
+    List<String> cgiDataFilteredKeys = []
     boolean secure = false
     boolean enabled = true
     String host = AirbrakeNotifier.AIRBRAKE_HOST
@@ -35,6 +37,8 @@ class Configuration {
         if (!stackTraceFilterer) {
             stackTraceFilterer = new DefaultStackTraceFilterer()
         }
+
+        handleLegacyFilteredKeys(options)
     }
 
     Map merge(Map options) {
@@ -75,4 +79,14 @@ class Configuration {
         }
     }
 
+    // We used to have a single filteredKeys configuration parameter that was used for params, session and cgiData filtering
+    // Here we provide backwards compatibilty for that old setting
+    private handleLegacyFilteredKeys(Map options) {
+        if (options.filteredKeys) {
+            log.warn "Configuration option 'filteredKeys' is deprecated. Use 'paramsFilteredKeys', 'sessionFilteredKeys' or 'cgiDataFilteredKeys' instead."
+            paramsFilteredKeys = options.filteredKeys
+            sessionFilteredKeys = options.filteredKeys
+            cgiDataFilteredKeys = options.filteredKeys
+        }
+    }
 }

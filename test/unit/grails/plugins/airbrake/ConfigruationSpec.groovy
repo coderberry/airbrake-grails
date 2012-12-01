@@ -137,4 +137,14 @@ class ConfigruationSpec extends Specification {
         null                || 5
         42                  || 42
     }
+
+    def 'backwards compatibility for old filteredKeys configuration option'() {
+        given:
+        def configuration = new Configuration([filteredKeys: ['password']])
+
+        expect:
+        configuration.paramsFilteredKeys == ['password']
+        configuration.sessionFilteredKeys == ['password']
+        configuration.cgiDataFilteredKeys == ['password']
+    }
 }

@@ -29,7 +29,9 @@ class NoticeConstructorSpec extends Specification {
                 notifierName: 'notifier',
                 notifierUrl: 'http://my.notifier.com/about',
                 notifierVersion: '0.1.2',
-                filteredKeys: ['password'],
+                paramsFilteredKeys: ['password'],
+                sessionFilteredKeys: ['userId'],
+                cgiDataFilteredKeys: ['dbConnectionString'],
                 user: [id: '12345']
         )
 
@@ -41,7 +43,9 @@ class NoticeConstructorSpec extends Specification {
         notice.notifierName == 'notifier'
         notice.notifierUrl == 'http://my.notifier.com/about'
         notice.notifierVersion == '0.1.2'
-        notice.filteredKeys == ['password']
+        notice.paramsFilteredKeys == ['password']
+        notice.sessionFilteredKeys == ['userId']
+        notice.cgiDataFilteredKeys == ['dbConnectionString']
         notice.user == [id: '12345']
     }
 
@@ -266,7 +270,8 @@ class NoticeConstructorSpec extends Specification {
     @Unroll
     def 'constructor should filter #paramsMap'() {
         when: 'have some some paramsFilters'
-        def notice = new Notice(filteredKeys: ['ask'], (paramsMap): [ask: 'me', something: 'interesting'] )
+        String filteredKeysString = "${paramsMap}FilteredKeys".toString()
+        def notice = new Notice((filteredKeysString): ['ask'], (paramsMap): [ask: 'me', something: 'interesting'] )
 
         then:
         notice."$paramsMap" == [ask: '[FILTERED]', something: 'interesting']
@@ -278,7 +283,8 @@ class NoticeConstructorSpec extends Specification {
     @Unroll
     def 'constructor should filter #paramsMap using regular expression filters'() {
         when: 'we construct the notice'
-        def notice = new Notice(filteredKeys: ['a.*'], (paramsMap): [ask: 'me', something: 'interesting'] )
+        String filteredKeysString = "${paramsMap}FilteredKeys".toString()
+        def notice = new Notice((filteredKeysString): ['a.*'], (paramsMap): [ask: 'me', something: 'interesting'] )
 
         then:
         notice."$paramsMap" == [ask: '[FILTERED]', something: 'interesting']

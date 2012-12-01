@@ -70,7 +70,9 @@ grails.plugins.airbrake.apiKey
 grails.plugins.airbrake.enabled
 grails.plugins.airbrake.env
 grails.plugins.airbrake.includeEventsWithoutExceptions
-grails.plugins.airbrake.filteredKeys
+grails.plugins.airbrake.paramsFilteredKeys
+grails.plugins.airbrake.sessionFilteredKeys
+grails.plugins.airbrake.cgiDataFilteredKeys
 grails.plugins.airbrake.host
 grails.plugins.airbrake.port
 grails.plugins.airbrake.secure
@@ -125,7 +127,18 @@ class SomeGroovyClass {
 
 Note: It might be reasonable to have this setting true by default but for backwards compatibility with previous versions of te plugin the default is false.
 
-### Filtering Parameters
+### Filtering Parameters sent to Airbrake
+To prevent certain parameters from being sent to Airbrake you can configure a list of parameter names to filter out. The configuration settings `paramsFilteredKeys`, `sessionFilteredKeys` and `cgiFilteredKeys` filter the params, session and cgi data sent to Airbrake.
+For example to prevent any web request parameter named 'password' from being included in the notification to Airbrake you would use the following configuration:
+```groovy
+grails.plugins.airbrake.parametersFilteredKeys = ['password']
+```
+
+Each configuration option also supports regular expression matching on the keys. For example the following configuration would prevent all session data from being sent to Airbrake:
+```groovy
+grails.plugins.airbrake.sessionFilteredKeys = ['.*']
+```
+
 
 ### Custom Airbrake Host, Port and Scheme
 
@@ -163,17 +176,17 @@ class AirbrakeFilters {
 By default, notifications are sent to Airbrake synchronously using a thread-pool of size 5. To change the size of this thread
 pool set the following config parameter:
 
-````groovy
+```groovy
 // double the size of the pool
 grails.plugins.airbrake.asyncThreadPoolSize = 10
-````
+```
 
-To have the notifications sent synchronously, set this parameter to false:
+To have the notifications sent synchronously, set the async parameter to false:
 
-````groovy
+```groovy
 // send notifications synchronously
-grails.plugins.airbrake.asyncThreadPoolSize = false
-````
+grails.plugins.airbrake.async = false
+```
 
 ### Custom Asynchronous Handler
 To send the notifications asynchronously using a custom handler, use the async configuration option.
@@ -239,10 +252,11 @@ This plugin is compatible with Grails version 2.0 or greater. A backport to Grai
     * Added method to AirbrakeService set notification context information that will be used for any reported errors
     * Simpler api to provide User Data. No need to implement UserDataService instead just set the context. (Breaking Change)
     * All request headers now included when reporting an error.
-* 0.9.1 - TBD
+* 0.9.1 - TDB
     * Notifications sent to Airbrake asynchronously by default using a thread pool of configurable size #20
     * By default stack traces are filtered #19
     * New configuration option to support custom stack trace filtering
+    * New configuration options for filtering params, session and cgi data independently
 
 ## Contributing
 

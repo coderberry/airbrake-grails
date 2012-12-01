@@ -56,9 +56,19 @@ class Notice {
     String action
 
     /**
-     * A list of key names or regular expression use to filter parameters, session and cgiData
+     * A list of key names or regular expression use to filter parameters
      */
-    List<String> filteredKeys
+    List<String> paramsFilteredKeys
+
+    /**
+     * A list of key names or regular expression use to filter cgiData
+     */
+    List<String> cgiDataFilteredKeys
+
+    /**
+     * A list of key names or regular expression use to filter session data
+     */
+    List<String> sessionFilteredKeys
 
     /**
      * A Map of parameters for the web request the exception occurred in (from query string of post body)
@@ -128,7 +138,9 @@ class Notice {
         this.notifierVersion = args.notifierVersion
         this.notifierUrl = args.notifierUrl
 
-        this.filteredKeys = args.filteredKeys
+        this.paramsFilteredKeys = args.paramsFilteredKeys
+        this.cgiDataFilteredKeys = args.cgiDataFilteredKeys
+        this.sessionFilteredKeys = args.sessionFilteredKeys
         this.params = args.params ?: webRequest?.parameterMap
 
         this.url = args.url ?: constructUrl(webRequest)
@@ -236,7 +248,9 @@ class Notice {
             notifierName: notifierName,
             notifierVersion: notifierVersion,
             notifierUrl: notifierUrl,
-            filteredKeys: filteredKeys,
+            paramsFilteredKeys: paramsFilteredKeys,
+            cgiDataFilteredKeys: cgiDataFilteredKeys,
+            sessionFilteredKeys: sessionFilteredKeys,
             url: url,
             component: component,
             action: action,
@@ -302,19 +316,13 @@ class Notice {
         url.toString()
     }
 
-    private addSupplementerDetails() {
-        supplementers.each {
-            it.supplement(this)
-        }
-    }
-
     private applyFilters() {
         ['session', 'cgiData', 'params'].each {
-           setProperty(it, filterParameters(getProperty(it)) )
+           setProperty(it, filterParameters(getProperty(it), getProperty("${it}FilteredKeys")) )
         }
     }
 
-    private Map filterParameters(Map params) {
+    private Map filterParameters(Map params, List<String> filteredKeys) {
         params?.collectEntries { k, v ->
             def filteredValue = filteredKeys?.any { k =~ it } ? "[FILTERED]" : v.toString()
             [(k): filteredValue]
