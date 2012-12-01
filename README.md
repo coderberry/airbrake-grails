@@ -9,7 +9,7 @@ When an uncaught exception occurs, Airbrake will POST the relevant data to the A
 Add the following to your `BuildConfig.groovy`
 
 ```
-compile ":airbrake:0.9.0"
+compile ":airbrake:0.9.1"
 ```
 
 Once the plugin is installed, you need to provide your Api Key in `Config.groovy` file:
@@ -252,7 +252,7 @@ This plugin is compatible with Grails version 2.0 or greater. A backport to Grai
     * Added method to AirbrakeService set notification context information that will be used for any reported errors
     * Simpler api to provide User Data. No need to implement UserDataService instead just set the context. (Breaking Change)
     * All request headers now included when reporting an error.
-* 0.9.1 - TDB
+* 0.9.1 - 2012/11/30
     * Notifications sent to Airbrake asynchronously by default using a thread pool of configurable size #20
     * By default stack traces are filtered #19
     * New configuration option to support custom stack trace filtering
