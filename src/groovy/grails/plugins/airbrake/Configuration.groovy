@@ -20,6 +20,7 @@ class Configuration {
     List<String> cgiDataFilteredKeys = []
     boolean secure = false
     boolean enabled = true
+    String path = AirbrakeNotifier.AIRBRAKE_PATH
     String host = AirbrakeNotifier.AIRBRAKE_HOST
     Integer port
     boolean includeEventsWithoutExceptions = false

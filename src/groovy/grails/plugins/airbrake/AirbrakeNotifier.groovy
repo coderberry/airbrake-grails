@@ -18,8 +18,6 @@ class AirbrakeNotifier {
 
     final Configuration configuration
 
-	private String path = AIRBRAKE_PATH
-
     // mostly to make mocking easier in specs
     protected AirbrakeNotifier() {}
 
@@ -90,7 +88,7 @@ class AirbrakeNotifier {
     }
 
     private HttpURLConnection buildConnection() {
-        URL apiURL = new URL(configuration.scheme, configuration.host, configuration.port, path)
+        URL apiURL = new URL(configuration.scheme, configuration.host, configuration.port, configuration.path)
 
         HttpURLConnection conn = apiURL.openConnection()
         conn.setDoOutput(true)
