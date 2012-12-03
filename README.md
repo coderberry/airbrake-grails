@@ -173,7 +173,7 @@ class AirbrakeFilters {
 
 ## Synchronous/Asynchronous notifications
 
-By default, notifications are sent to Airbrake synchronously using a thread-pool of size 5. To change the size of this thread
+By default, notifications are sent to Airbrake asynchronously using a thread-pool of size 5. To change the size of this thread
 pool set the following config parameter:
 
 ```groovy
