@@ -32,6 +32,25 @@ class ConfigruationSpec extends Specification {
         config.port == 1234
     }
 
+    def 'constructor assigns a path if none is specified'() {
+        when:
+        def config = new Configuration()
+
+        then:
+        config.path == AirbrakeNotifier.AIRBRAKE_PATH
+    }
+
+    def 'constructor uses supplied path'() {
+        given:
+        def suppliedPath = '/errbit/notifier_api/v2/notices'
+
+        when:
+        def config = new Configuration(path: suppliedPath)
+
+        then:
+        config.path == suppliedPath
+    }
+
     @Unroll
     def 'scheme'() {
         when:
