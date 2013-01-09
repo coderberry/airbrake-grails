@@ -4,7 +4,6 @@ import groovy.transform.ToString
 import groovy.xml.MarkupBuilder
 import org.codehaus.groovy.grails.web.servlet.mvc.GrailsWebRequest
 import org.springframework.web.context.request.RequestContextHolder
-import org.codehaus.groovy.grails.exceptions.DefaultStackTraceFilterer
 import org.codehaus.groovy.grails.exceptions.StackTraceFilterer
 
 @ToString(includeNames = true)
@@ -148,7 +147,7 @@ class Notice {
         this.action = args.action ?: webRequest?.actionName
 
         this.env = args.env
-        this.cgiData = args.cgiData ?: getCgiData(webRequest)
+        this.cgiData = args.cgiData ?: getCgiDataFromRequest(webRequest)
         this.session = args.session ?: getSessionData(webRequest)
         this.backtrace = parseBacktrace(throwable?.stackTrace ?: args.backtrace)
         this.errorClass = throwable?.class?.name ?: args.errorClass
@@ -278,7 +277,7 @@ class Notice {
         argsWithDefaults
     }
 
-    private Map getCgiData(webRequest) {
+    private Map getCgiDataFromRequest(webRequest) {
         def request = webRequest?.request
         def data = [:]
         request?.headerNames?.each { data[it] =  request.getHeader(it) }
