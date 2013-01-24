@@ -131,7 +131,7 @@ Note: It might be reasonable to have this setting true by default but for backwa
 To prevent certain parameters from being sent to Airbrake you can configure a list of parameter names to filter out. The configuration settings `paramsFilteredKeys`, `sessionFilteredKeys` and `cgiFilteredKeys` filter the params, session and cgi data sent to Airbrake.
 For example to prevent any web request parameter named 'password' from being included in the notification to Airbrake you would use the following configuration:
 ```groovy
-grails.plugins.airbrake.parametersFilteredKeys = ['password']
+grails.plugins.airbrake.paramsFilteredKeys = ['password']
 ```
 
 Each configuration option also supports regular expression matching on the keys. For example the following configuration would prevent all session data from being sent to Airbrake:
