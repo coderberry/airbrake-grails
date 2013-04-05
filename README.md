@@ -142,6 +142,14 @@ grails.plugins.airbrake.sessionFilteredKeys = ['.*']
 
 ### Custom Airbrake Host, Port and Scheme
 
+If you are running the Airbrake server locally (or a clone thereof, e.g. Errbit), you will need to customise the server URL, port, scheme, etc.
+For example to change the server host and port, add the following configuration parameters:
+
+````groovy
+grails.plugins.airbrake.host = 'errbit.example.org'
+grails.plugins.airbrake.port = 8080
+````
+
 ### Adding Custom Data to Error Notifications
 
 ### Supplying User Data
