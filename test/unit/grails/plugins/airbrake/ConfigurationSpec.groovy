@@ -8,7 +8,7 @@ import grails.test.mixin.support.GrailsUnitTestMixin
 import grails.test.mixin.TestMixin
 
 @TestMixin(GrailsUnitTestMixin)
-class ConfigruationSpec extends Specification {
+class ConfigurationSpec extends Specification {
 
     @Unroll
     def 'constructor assigns a port if non is supplied'() {
@@ -85,12 +85,12 @@ class ConfigruationSpec extends Specification {
         merge.class == null
     }
 
-    def 'async that is not a Closure or true gets nulled out'() {
+    def 'async that is not a Closure or true should default to thread pool Closure'() {
         given: ''
         def configuration = new Configuration([ async: 'do something' ])
 
         expect:
-        configuration.async == null
+        configuration.async instanceof Closure
     }
 
     def 'async can be a Closure'() {
