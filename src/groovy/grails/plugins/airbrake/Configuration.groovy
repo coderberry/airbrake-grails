@@ -61,9 +61,14 @@ class Configuration {
     }
 
     private configureDefaultAsyncClosure(Map options) {
-        def async = (options.async != null) ? options.async : true
+
+        def async = options.async
+
         if (!(async instanceof Closure)) {
-            if (async == true ) {
+
+            // if omitted async will be of type ConfigObject
+            if (async instanceof ConfigObject || async as Boolean) {
+
                 log.info "configureDefaultAsyncClosure create default async handler with threadPool"
                 def threadPoolSize = options.asyncThreadPoolSize ?: 5
                 threadPool = Executors.newFixedThreadPool(threadPoolSize)
@@ -75,6 +80,7 @@ class Configuration {
                     threadPool.submit(sendToAirbrake)
                 }
             } else {
+                // only send notices synchronously if the async option is explicitly set to false
                 options.async = null
             }
         }
