@@ -22,7 +22,7 @@ grails.plugins.airbrake.apiKey = 'YOUR_API_KEY'
 
 Once you have installed and configured the plugin there is nothing else to do. Uncaught exceptions will be logged by log4j and those errors will be reported to Airbrake. However, the plugin also exposes a few other ways to send errors to airbrake.
 
-### Logging Erorrs with Exceptions
+### Logging Errors with Exceptions
 
 Manually logging messages at the error level and including an Exception triggers an error notification to airbrake:
 
@@ -81,7 +81,7 @@ grails.plugins.airbrake.asyncThreadPoolSize
 grails.plugins.airbrake.stackTraceFilterer
 ```
 
-### Enabling/Disabling notifications
+### Enabling/Disabling Notifications
 By default all errors are sent to Airbrake. However, you can disable error notifications (essentially disabling the plugin) by setting `grails.plugins.airbrake.enabled = false`. For example to disable error notificaitons in development and test environments you might have the following in `Config.groovy`:
 
 ```groovy
@@ -94,6 +94,23 @@ environments {
 		grails.plugins.airbrake.enabled = false
 	}
 ```
+
+If you add the config parameter
+
+````groovy
+grails.plugins.airbrake.testOnStartup = true
+````
+
+the plugin will send a test notification to the server on startup. If this notification fails (e.g. because the API key
+is incorrect or the server is unavailable), the sending of further notifications will be disabled. Notifications can be
+re-enabled without restarting the application as described in the following section.
+
+#### Runtime Enabling/Disabling
+If you wish to enable/disable notifications at runtime you have a couple of options
+
+* Call the service method `airbrakeService.setEnabled(boolean enabled)`
+* Invoke the `setEnabled` action of `AirbrakeTestController`. This action expects a single parameter either `enabled=true` or `enabled=false`
+
 
 ### Setting the Environment
 By default, the environment name used in Airbrake will match that of the current Grails environment. To change this default, set the env property:

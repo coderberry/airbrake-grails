@@ -44,4 +44,9 @@ class AirbrakeTestController {
         airbrakeService.addNoticeContext(customComponent, customAction, [time: time])
         airbrakeService.notify(null, [errorMessage: "${message} ${time}"])
     }
+
+    def setEnabled(Boolean enabled) {
+        airbrakeService.setEnabled(enabled)
+        redirect uri: '/'
+    }
 }
