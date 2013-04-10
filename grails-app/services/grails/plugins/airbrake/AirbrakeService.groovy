@@ -40,7 +40,7 @@ class AirbrakeService {
 
         Configuration config = airbrakeNotifier.configuration
 
-        if (config.testOnStartup) {
+        if (config.enabled && config.testOnStartup) {
             def noticeOptions = [throwable: new TestAirbrakeAvailableException()]
             Notice testNotice = airbrakeNotifier.buildNotice(noticeOptions)
 
