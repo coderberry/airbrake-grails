@@ -51,6 +51,7 @@ class AirbrakeService {
     }
 
     void setEnabled(boolean enabled) {
+        log.info "airbrake notifier ${enabled ? 'enabled' : 'disabled'}"
         airbrakeNotifier.configuration.enabled = enabled
     }
 }
