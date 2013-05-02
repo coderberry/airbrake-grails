@@ -35,18 +35,19 @@ class AirbrakeService {
      * If the testOnStartup config param is enabled, send a test notice on startup and disable notice sending
      * if this test fails
      */
-    @PostConstruct
-    void testAirbrake() {
+    boolean testAirbrake() {
 
         Configuration config = airbrakeNotifier.configuration
 
-        if (config.enabled && config.testOnStartup) {
+        if (config.enabled) {
             def noticeOptions = [throwable: new TestAirbrakeAvailableException()]
             Notice testNotice = airbrakeNotifier.buildNotice(noticeOptions)
 
             log.info "Sending test notification with API key '$config.apiKey' to host '$config.host'"
-            boolean testNoticeSuccessful = airbrakeNotifier.sendToAirbrake(testNotice)
-            setEnabled(testNoticeSuccessful)
+            airbrakeNotifier.sendToAirbrake(testNotice)
+
+        } else {
+            log.warn "Cannot test Airbrake because plugin is disabled"
         }
     }
 
