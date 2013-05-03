@@ -95,16 +95,6 @@ environments {
 	}
 ```
 
-If you add the config parameter
-
-````groovy
-grails.plugins.airbrake.testOnStartup = true
-````
-
-the plugin will send a test notification to the server on startup. If this notification fails (e.g. because the API key
-is incorrect or the server is unavailable), the sending of further notifications will be disabled. Notifications can be
-re-enabled without restarting the application as described in the following section.
-
 #### Runtime Enabling/Disabling
 If you wish to enable/disable notifications at runtime you have a couple of options
 

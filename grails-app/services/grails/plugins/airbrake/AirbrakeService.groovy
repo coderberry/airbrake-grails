@@ -32,8 +32,8 @@ class AirbrakeService {
     }
 
     /**
-     * If the testOnStartup config param is enabled, send a test notice on startup and disable notice sending
-     * if this test fails
+     * Send a test notice to airbrake
+     * @return the outcome of the test
      */
     boolean testAirbrake() {
 
