@@ -45,7 +45,7 @@ class AirbrakeNotifier {
         }
 	}
 
-    def sendToAirbrake(Notice notice) {
+    boolean sendToAirbrake(Notice notice) {
         if (!configuration.enabled) {
             return
         }
@@ -74,9 +74,11 @@ class AirbrakeNotifier {
 
             int responseCode = conn.responseCode
             String responseMessage = conn.responseMessage
+            log.debug "Received HTTP response $responseCode"
 
             if (responseCode in 200..<300) {
-                log.debug "Received successful HTTP response $responseCode"
+                return true
+
             } else {
                 System.err.println("HTTP Response ${responseCode}: ${responseMessage}. Failed to send: ${notice}")
             }
@@ -85,6 +87,7 @@ class AirbrakeNotifier {
         } finally {
             conn?.disconnect()
         }
+        return false
     }
 
     private HttpURLConnection buildConnection() {

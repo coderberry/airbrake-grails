@@ -7,7 +7,7 @@ import org.springframework.core.NamedThreadLocal
  * Simple holder class that associates a Notice Request instance
  * with the current thread.
  */
-protected abstract class NoticeContextHolder {
+abstract class NoticeContextHolder {
 
     private static final ThreadLocal<Map> requestContextHolder = new NamedThreadLocal<Map>("Notice context")
 
