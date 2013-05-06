@@ -66,7 +66,7 @@ class AirbrakeNotifier {
         }
 
         if (excludingPattern) {
-            log.debug "Sending errors of type type $throwableClassname is prevented by the excludes pattern '${excludingPattern.pattern()}"
+            log.debug "Sending errors of type type $throwableClassname is prevented by the excludes pattern '${excludingPattern.pattern()}'"
         }
         excludingPattern
     }
