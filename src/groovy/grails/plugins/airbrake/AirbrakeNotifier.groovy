@@ -26,8 +26,8 @@ class AirbrakeNotifier {
     }
 
     void notify(Throwable throwable, Map options = [:]) {
-        // if we're not enabled don't go through the effort of building the message
-        if (configuration.enabled) {
+
+        if (!isExcluded(throwable)) {
             options.throwable = throwable
             sendNotice(buildNotice(options))
         }
@@ -45,10 +45,43 @@ class AirbrakeNotifier {
         }
 	}
 
-    boolean sendToAirbrake(Notice notice) {
+    /**
+     * Indicates whether <tt>throwable</tt> can be sent to Airbrake. It will not be eligible for sending if
+     * <ul>
+     *     <li>The Airbrake plugin is disabled</li>
+     *     <li>One of the configured exclusions patterns matches it</li>
+     * </ul>
+     * @param throwable
+     * @return
+     */
+    private boolean isExcluded(Throwable throwable) {
+
         if (!configuration.enabled) {
+            return true
+        }
+
+        if (!throwable) {
+            return false
+        }
+
+        String throwableClassname = throwable.class.name
+
+        boolean excluded = configuration.excludes.any {String excludePattern ->
+            throwableClassname ==~ excludePattern
+        }
+
+        if (excluded) {
+            log.debug "The Airbrake plugin config. excludes sending errors of type $throwableClassname"
+        }
+        excluded
+    }
+
+    boolean sendToAirbrake(Notice notice) {
+
+        if (isExcluded(notice.throwable)) {
             return
         }
+
         if (!notice.apiKey) {
             throw new RuntimeException("The API key for the project this error is from is required. Get this from the project's page in airbrake.")
         }

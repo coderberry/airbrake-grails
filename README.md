@@ -79,6 +79,7 @@ grails.plugins.airbrake.secure
 grails.plugins.airbrake.async
 grails.plugins.airbrake.asyncThreadPoolSize
 grails.plugins.airbrake.stackTraceFilterer
+grails.plugins.airbrake.excludes
 ```
 
 ### Enabling/Disabling Notifications
@@ -94,6 +95,20 @@ environments {
 		grails.plugins.airbrake.enabled = false
 	}
 ```
+
+#### Disabling Notifications by Exception Type
+For example, to disable notifications caused by `IllegalArgumentException` and `IllegalStateException`, configure
+
+````groovy
+grails.plugins.airbrake.excludes = ['java.lang.IllegalArgumentException', 'java.lang.IllegalStateException']
+````
+
+each entry in the list will be converted to a `Pattern` and matched against the exception class name, so the following
+would also exclude these two exceptions:
+
+````groovy
+grails.plugins.airbrake.excludes = ['java.lang.Illegal.*Exception']
+````
 
 #### Runtime Enabling/Disabling
 If you wish to enable/disable notifications at runtime you have a couple of options

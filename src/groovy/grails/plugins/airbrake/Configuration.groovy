@@ -26,7 +26,7 @@ class Configuration {
     boolean includeEventsWithoutExceptions = false
     Closure async
     StackTraceFilterer stackTraceFilterer
-    Boolean testOnStartup = false
+    List excludes = []
 
     private ExecutorService threadPool
 
