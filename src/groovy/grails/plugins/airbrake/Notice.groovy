@@ -181,12 +181,20 @@ class Notice {
                 'class'(errorClass)
                 message(errorMessage)
                 backtrace {
-                    backtrace.each {
-                        'line'(
-                                file: it.fileName,
-                                number: it.lineNumber,
-                                method: "${it.className}.${it.methodName}"
-                        )
+
+                    if (backtrace) {
+                        backtrace.each {
+                            'line'(
+                                    file: it.fileName,
+                                    number: it.lineNumber,
+                                    method: "${it.className}.${it.methodName}"
+                            )
+                        }
+                    } else {
+                        // If there is no exception, there would otherwise be no <line> element in the notice XML
+                        // and the notice is rejected by Errbit (but not Airbrake).
+                        // This worksaround this problem by adding a single empty <line/>
+                        'line'([:])
                     }
                 }
             }
