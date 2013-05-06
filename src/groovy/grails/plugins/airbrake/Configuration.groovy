@@ -8,6 +8,8 @@ import java.util.concurrent.Executors
 import java.util.concurrent.ExecutorService
 import groovy.util.logging.Log4j
 
+import java.util.regex.Pattern
+
 @Log4j
 class Configuration {
     String notifierName = AirbrakeNotifier.NOTIFIER_NAME
@@ -41,6 +43,13 @@ class Configuration {
         }
 
         handleLegacyFilteredKeys(options)
+    }
+
+    void setExcludes(List exclusions) {
+
+        this.excludes = exclusions.collect {excludePattern ->
+            Pattern.compile(excludePattern.toString())
+        }
     }
 
     Map merge(Map options) {

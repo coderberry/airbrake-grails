@@ -3,6 +3,8 @@ package grails.plugins.airbrake
 import groovy.transform.ToString
 import groovy.util.logging.Log4j
 
+import java.util.regex.Pattern
+
 @ToString(includeNames=true)
 @Log4j
 class AirbrakeNotifier {
@@ -27,7 +29,7 @@ class AirbrakeNotifier {
 
     void notify(Throwable throwable, Map options = [:]) {
 
-        if (!isExcluded(throwable)) {
+        if (configuration.enabled && !isExcluded(throwable)) {
             options.throwable = throwable
             sendNotice(buildNotice(options))
         }
@@ -47,18 +49,11 @@ class AirbrakeNotifier {
 
     /**
      * Indicates whether <tt>throwable</tt> can be sent to Airbrake. It will not be eligible for sending if
-     * <ul>
-     *     <li>The Airbrake plugin is disabled</li>
-     *     <li>One of the configured exclusions patterns matches it</li>
-     * </ul>
+     * one of the configured exclusions patterns matches it.
      * @param throwable
      * @return
      */
     private boolean isExcluded(Throwable throwable) {
-
-        if (!configuration.enabled) {
-            return true
-        }
 
         if (!throwable) {
             return false
@@ -66,19 +61,19 @@ class AirbrakeNotifier {
 
         String throwableClassname = throwable.class.name
 
-        boolean excluded = configuration.excludes.any {String excludePattern ->
+        Pattern excludingPattern = configuration.excludes.find {Pattern excludePattern ->
             throwableClassname ==~ excludePattern
         }
 
-        if (excluded) {
-            log.debug "The Airbrake plugin config. excludes sending errors of type $throwableClassname"
+        if (excludingPattern) {
+            log.debug "Sending errors of type type $throwableClassname is prevented by the excludes pattern '${excludingPattern.pattern()}"
         }
-        excluded
+        excludingPattern
     }
 
     boolean sendToAirbrake(Notice notice) {
 
-        if (isExcluded(notice.throwable)) {
+        if (!configuration.enabled) {
             return
         }
 
