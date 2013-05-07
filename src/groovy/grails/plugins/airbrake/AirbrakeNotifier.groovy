@@ -74,7 +74,7 @@ class AirbrakeNotifier {
     boolean sendToAirbrake(Notice notice) {
 
         if (!configuration.enabled) {
-            return
+            return false
         }
 
         if (!notice.apiKey) {
