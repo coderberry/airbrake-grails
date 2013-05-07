@@ -66,7 +66,20 @@ class NoticeToXmlSpec extends Specification {
         lines[1].'@number' == '5'
         lines[1].'@method' == 'com.acme.RabbitTrapsController.net'
     }
-    
+
+    def 'notice XML should contain <backtrace><line/></backtrace> when no exception, see issue #33'() {
+
+        given: 'a notice without an error'
+        def args = [errorMessage: 'That rascally rabbit escaped']
+        def notice = new Notice(args)
+
+        when: 'we serialize'
+        def xml = getXmlFromSerializer(notice)
+
+        then:
+        1 == xml.error.backtrace.line.size()
+    }
+
     @Unroll
     def 'serialize #paramsMap'() {
         given: 'a notice'
