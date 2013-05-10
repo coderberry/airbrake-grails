@@ -12,7 +12,7 @@ grails.project.dependency.resolution = {
     }
 
     plugins {
-        build(":release:2.1.0", ":rest-client-builder:1.0.2", ":tomcat:$grailsVersion") {
+        build(":release:2.2.1", ":rest-client-builder:1.0.2", ":tomcat:$grailsVersion") {
             export = false
         }
         test(':spock:0.7') {
