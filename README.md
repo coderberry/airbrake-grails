@@ -9,7 +9,7 @@ When an uncaught exception occurs, Airbrake will POST the relevant data to the A
 Add the following to your `BuildConfig.groovy`
 
 ```
-compile ":airbrake:0.9.2"
+compile ":airbrake:0.9.3"
 ```
 
 Once the plugin is installed, you need to provide your Api Key in `Config.groovy` file:
@@ -287,8 +287,14 @@ This plugin is compatible with Grails version 2.0 or greater. A backport to Grai
     * By default stack traces are filtered #19
     * New configuration option to support custom stack trace filtering
     * New configuration options for filtering params, session and cgi data independently
-* 0.9.2 - 2013/11/19
+* 0.9.2 - 2013/1/19
     * Support for Grails 2.2 and Groovy 2.0 #27
+* 0.9.3 - 2013/05/10
+    * New feature to enable/disable notification send while the plugin is running #31
+    * New configuration option to filter exceptions by name or pattern #34
+    * Bug fix. Don't send notifications synchronously by default #26
+    * Bug fix. Handle empty backtrace more gracefully for Errbit #33
+    * Thanks to @domurtag for all the fixes
 
 ## Contributing
 
