@@ -14,7 +14,7 @@ class AirbrakeNotifierSpec extends Specification {
         def asyncNotices = []
         def asyncGrailsApplications = []
         def configuration = Mock(Configuration)
-//        def asyncClosure = { notice, grailsApplication -> }
+
         configuration.getAsync() >>  {
             { n, a ->
                 asyncNotices << n
@@ -46,5 +46,29 @@ class AirbrakeNotifierSpec extends Specification {
 
         then:
         1 * airbrakeNotifier.sendToAirbrake(notice) >> true // return something to prevent underlying implementation from being called
+    }
+
+    def 'notice not sent when exclude pattern matches throwable'() {
+        given:
+        def configuration = new Configuration([excludes: [IllegalArgumentException.name]])
+        def airbrakeNotifier = Spy(AirbrakeNotifier, constructorArgs: [configuration])
+
+        when:
+        airbrakeNotifier.notify(new IllegalArgumentException())
+
+        then:
+        0 * airbrakeNotifier.sendNotice(_ as Notice)
+    }
+
+    def 'notice sent when exclude pattern does not match throwable'() {
+        given:
+        def configuration = new Configuration([excludes: [NullPointerException.name]])
+        def airbrakeNotifier = Spy(AirbrakeNotifier, constructorArgs: [configuration])
+
+        when:
+        airbrakeNotifier.notify(new IllegalArgumentException())
+
+        then:
+        1 * airbrakeNotifier.sendToAirbrake(_ as Notice) >> true // return something to prevent underlying implementation from being called
     }
 }

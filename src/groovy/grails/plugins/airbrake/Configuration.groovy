@@ -8,6 +8,8 @@ import java.util.concurrent.Executors
 import java.util.concurrent.ExecutorService
 import groovy.util.logging.Log4j
 
+import java.util.regex.Pattern
+
 @Log4j
 class Configuration {
     String notifierName = AirbrakeNotifier.NOTIFIER_NAME
@@ -26,7 +28,7 @@ class Configuration {
     boolean includeEventsWithoutExceptions = false
     Closure async
     StackTraceFilterer stackTraceFilterer
-    Boolean testOnStartup = false
+    List excludes = []
 
     private ExecutorService threadPool
 
@@ -41,6 +43,13 @@ class Configuration {
         }
 
         handleLegacyFilteredKeys(options)
+    }
+
+    void setExcludes(List exclusions) {
+
+        this.excludes = exclusions.collect {excludePattern ->
+            Pattern.compile(excludePattern.toString())
+        }
     }
 
     Map merge(Map options) {

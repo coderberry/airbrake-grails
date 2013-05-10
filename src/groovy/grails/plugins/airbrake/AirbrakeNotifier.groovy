@@ -3,6 +3,8 @@ package grails.plugins.airbrake
 import groovy.transform.ToString
 import groovy.util.logging.Log4j
 
+import java.util.regex.Pattern
+
 @ToString(includeNames=true)
 @Log4j
 class AirbrakeNotifier {
@@ -26,8 +28,8 @@ class AirbrakeNotifier {
     }
 
     void notify(Throwable throwable, Map options = [:]) {
-        // if we're not enabled don't go through the effort of building the message
-        if (configuration.enabled) {
+
+        if (configuration.enabled && !isExcluded(throwable)) {
             options.throwable = throwable
             sendNotice(buildNotice(options))
         }
@@ -45,10 +47,36 @@ class AirbrakeNotifier {
         }
 	}
 
-    boolean sendToAirbrake(Notice notice) {
-        if (!configuration.enabled) {
-            return
+    /**
+     * Indicates whether <tt>throwable</tt> can be sent to Airbrake. It will not be eligible for sending if
+     * one of the configured exclusions patterns matches it.
+     * @param throwable
+     * @return
+     */
+    private boolean isExcluded(Throwable throwable) {
+
+        if (!throwable) {
+            return false
         }
+
+        String throwableClassname = throwable.class.name
+
+        Pattern excludingPattern = configuration.excludes.find {Pattern excludePattern ->
+            throwableClassname ==~ excludePattern
+        }
+
+        if (excludingPattern) {
+            log.debug "Sending errors of type type $throwableClassname is prevented by the excludes pattern '${excludingPattern.pattern()}'"
+        }
+        excludingPattern
+    }
+
+    boolean sendToAirbrake(Notice notice) {
+
+        if (!configuration.enabled) {
+            return false
+        }
+
         if (!notice.apiKey) {
             throw new RuntimeException("The API key for the project this error is from is required. Get this from the project's page in airbrake.")
         }
