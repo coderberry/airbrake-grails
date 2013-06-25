@@ -28,10 +28,15 @@ class AirbrakeNotifier {
     }
 
     void notify(Throwable throwable, Map options = [:]) {
-
-        if (configuration.enabled && !isExcluded(throwable)) {
-            options.throwable = throwable
-            sendNotice(buildNotice(options))
+        // Notifying Airbrake can never throw
+        try {
+            if (configuration.enabled && !isExcluded(throwable)) {
+                options.throwable = throwable
+                sendNotice(buildNotice(options))
+            }
+        } catch (Throwable t) {
+            // Log the error to System.err so we don't go through log4j and spiral to our doom
+            System.err.println("Error notifying Airbrake about error ${options.errorMessage}. Error was ${t.message}.")
         }
     }
 
