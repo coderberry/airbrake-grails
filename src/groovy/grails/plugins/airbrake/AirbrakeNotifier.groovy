@@ -15,7 +15,7 @@ class AirbrakeNotifier {
 	static final String AIRBRAKE_PATH = '/notifier_api/v2/notices'
 
 	static final String NOTIFIER_NAME = 'grails-airbrake'
-	static final String NOTIFIER_VERSION = '0.9.3'
+	static final String NOTIFIER_VERSION = '0.9.4'
 	static final String NOTIFIER_URL = 'https://github.com/cavneb/airbrake-grails'
 
     final Configuration configuration

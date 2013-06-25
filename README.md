@@ -9,7 +9,7 @@ When an uncaught exception occurs, Airbrake will POST the relevant data to the A
 Add the following to your `BuildConfig.groovy`
 
 ```
-compile ":airbrake:0.9.3"
+compile ":airbrake:0.9.4"
 ```
 
 Once the plugin is installed, you need to provide your Api Key in `Config.groovy` file:
@@ -295,6 +295,8 @@ This plugin is compatible with Grails version 2.0 or greater. A backport to Grai
     * Bug fix. Don't send notifications synchronously by default #26
     * Bug fix. Handle empty backtrace more gracefully for Errbit #33
     * Thanks to @domurtag for all the fixes
+* 0.9.4 - 2013/06/25
+    * Bug fix. AirbrakeNotifier.notify no longer throws under any circumstance.
 
 ## Contributing
 
