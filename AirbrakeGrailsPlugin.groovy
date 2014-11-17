@@ -21,7 +21,7 @@ class AirbrakeGrailsPlugin {
     def author = "Eric Berry"
     def authorEmail = "cavneb@gmail.com"
     def description = "Airbrake Client for Grails"
-    def documentation = "http://grails.org/plugin/airbrake"
+    def documentation = "https://github.com/cavneb/airbrake-grails"
 
     def license = "APACHE"
     def developers = [ [ name: "Phuong LeCong", email: "phuong@reteltechnologies.com" ], [ name: "Jon Palmer", email: "jpalmer@care.com" ],
