@@ -1,7 +1,5 @@
 package grails.plugins.airbrake
 
-import javax.annotation.PostConstruct
-
 class AirbrakeService {
     static transactional = false
 

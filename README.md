@@ -258,16 +258,37 @@ grails.plugins.airbrake.stackTraceFilterer = new MyCustomStackTraceFilterer()
 
 ## Compatibility
 
-This plugin is compatible with Grails version 2.0 or greater. A backport to Grails 1.3 is available on the [grails-1.3 branch] (https://github.com/cavneb/airbrake-grails/tree/grails-1.3).
+This plugin is compatible with Grails version 3.0 or greater.
+A backport to Grails 1.3 is available on the [grails-1.3 branch] (https://github.com/cavneb/airbrake-grails/tree/grails-1.3).
+A backport to Grails 2.2 is available on the [grails-2.2 branch] (https://github.com/cavneb/airbrake-grails/tree/grails-2.2).
+
 
 ## Release Notes
 
-* 0.7 - 2012/09/21
-	* Added support for filtering parameters, session and cgiData. #2
-* 0.7.1 - 2012/09/21
-	* Change supported Grails version to 2.0.0. #3
-* 0.7.2 - 2012/09/24
-	* Added User Agent, Hostname and user data to notifications
+* 1.0.0.RC1 - 2015/07/27
+    * Support for Grails 3.0. #40
+* 0.9.4 - 2013/06/25
+    * Bug fix. AirbrakeNotifier.notify no longer throws under any circumstance.
+* 0.9.3 - 2013/05/10
+    * New feature to enable/disable notification send while the plugin is running #31
+    * New configuration option to filter exceptions by name or pattern #34
+    * Bug fix. Don't send notifications synchronously by default #26
+    * Bug fix. Handle empty backtrace more gracefully for Errbit #33
+    * Thanks to @domurtag for all the fixes
+* 0.9.2 - 2013/1/19
+    * Support for Grails 2.2 and Groovy 2.0 #27
+* 0.9.1 - 2012/11/30
+    * Notifications sent to Airbrake asynchronously by default using a thread pool of configurable size #20
+    * By default stack traces are filtered #19
+    * New configuration option to support custom stack trace filtering
+    * New configuration options for filtering params, session and cgi data independently
+* 0.9.0 - 2012/10/29
+    * Support for sending notifications to Airbrake asynchronously
+    * Added method to AirbrakeService set notification context information that will be used for any reported errors
+    * Simpler api to provide User Data. No need to implement UserDataService instead just set the context. (Breaking Change)
+    * All request headers now included when reporting an error.
+* 0.8.1 - 2012/10/19
+	* Better error message for uncaught exceptions. #18
 * 0.8 - 2012/10/16
 	* Simpler configuration (Breaking change)
 	* Default notification environment to current Grails environment. #9
@@ -275,28 +296,12 @@ This plugin is compatible with Grails version 2.0 or greater. A backport to Grai
 	* Support for notifying all messages logged at the error level (with or without exceptions)
 	* Simpler api for providing user data
 	* Full class names in stacktrace. #11
-* 0.8.1 - 2012/10/19
-	* Better error message for uncaught exceptions. #18
-* 0.9.0 - 2012/10/29
-    * Support for sending notifications to Airbrake asynchronously
-    * Added method to AirbrakeService set notification context information that will be used for any reported errors
-    * Simpler api to provide User Data. No need to implement UserDataService instead just set the context. (Breaking Change)
-    * All request headers now included when reporting an error.
-* 0.9.1 - 2012/11/30
-    * Notifications sent to Airbrake asynchronously by default using a thread pool of configurable size #20
-    * By default stack traces are filtered #19
-    * New configuration option to support custom stack trace filtering
-    * New configuration options for filtering params, session and cgi data independently
-* 0.9.2 - 2013/1/19
-    * Support for Grails 2.2 and Groovy 2.0 #27
-* 0.9.3 - 2013/05/10
-    * New feature to enable/disable notification send while the plugin is running #31
-    * New configuration option to filter exceptions by name or pattern #34
-    * Bug fix. Don't send notifications synchronously by default #26
-    * Bug fix. Handle empty backtrace more gracefully for Errbit #33
-    * Thanks to @domurtag for all the fixes
-* 0.9.4 - 2013/06/25
-    * Bug fix. AirbrakeNotifier.notify no longer throws under any circumstance.
+* 0.7.2 - 2012/09/24
+	* Added User Agent, Hostname and user data to notifications
+* 0.7.1 - 2012/09/21
+	* Change supported Grails version to 2.0.0. #3
+* 0.7 - 2012/09/21
+	* Added support for filtering parameters, session and cgiData. #2
 
 ## Contributing
 
