@@ -5,6 +5,9 @@ import grails.test.mixin.support.GrailsUnitTestMixin
 import grails.util.GrailsWebUtil
 import org.codehaus.groovy.grails.plugins.testing.GrailsMockHttpServletRequest
 import org.codehaus.groovy.grails.plugins.testing.GrailsMockHttpServletResponse
+import org.springframework.mock.web.MockHttpServletRequest
+import org.springframework.mock.web.MockHttpServletResponse
+import org.springframework.mock.web.MockServletContext
 import spock.lang.Specification
 import spock.lang.Unroll
 import org.springframework.web.context.request.RequestContextHolder
@@ -55,6 +58,34 @@ class NoticeConstructorSpec extends Specification {
 
         then:
         notice.url == null
+    }
+
+    def 'if env config param is assigned a closure the environment name is the value returned thereby'() {
+
+        given:
+        Closure envResolver = { GrailsWebRequest webRequest ->
+            webRequest.currentRequest.forwardURI
+        }
+
+        final String requestUri = '/foo/bar'
+
+        // stub the current request
+        RequestContextHolder.metaClass.static.getRequestAttributes = { ->
+            def mockRequest = new GrailsMockHttpServletRequest()
+            mockRequest.forwardURI = requestUri
+            def mockResponse = new GrailsMockHttpServletResponse()
+            def mockServletContext = new MockServletContext()
+            new GrailsWebRequest(mockRequest, mockResponse, mockServletContext)
+        }
+
+        when:
+        def notice = new Notice(env: envResolver)
+
+        then:
+        notice.env == requestUri
+
+        cleanup:
+        RequestContextHolder.metaClass = null
     }
 
     def 'url should use supplied url over the url of the current webRequest'() {
