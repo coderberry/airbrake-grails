@@ -146,7 +146,7 @@ class Notice {
         this.component = args.component ?: args.controller ?: webRequest?.controllerName
         this.action = args.action ?: webRequest?.actionName
 
-        this.env = args.env
+        this.env = args.env instanceof Closure ? args.env(webRequest) : args.env
         this.cgiData = args.cgiData ?: getCgiDataFromRequest(webRequest)
         this.session = args.session ?: getSessionData(webRequest)
         this.backtrace = parseBacktrace(throwable?.stackTrace ?: args.backtrace)

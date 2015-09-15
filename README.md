@@ -121,8 +121,20 @@ If you wish to enable/disable notifications at runtime you have a couple of opti
 By default, the environment name used in Airbrake will match that of the current Grails environment. To change this default, set the env property:
 
 ```groovy
-grails.plugins.airbrake.env = grails.util.Environment.current.name[0..0] // Airbrake env name changed from default value of Development/Test/Production to D/T/P
+// Airbrake env name changed from default value of Development/Test/Production to D/T/P
+grails.plugins.airbrake.env = grails.util.Environment.current.name[0..0] 
 ```
+
+To resolve the environment name using the HTTP context, assign a closure to this property instead. In the following
+example the environment name matches the value of the `Host` HTTP header
+ 
+ ```groovy
+ grails.plugins.airbrake.env = { GrailsWebRequest webRequest ->
+ 
+     HttpServletRequest request = webRequest?.currentRequest
+     request.getHeader('Host')
+ }
+ ```
 
 ### Including all events logged at the Error level
 

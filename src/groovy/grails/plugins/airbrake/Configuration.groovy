@@ -12,10 +12,8 @@ import java.util.regex.Pattern
 
 @Log4j
 class Configuration {
-    String notifierName = AirbrakeNotifier.NOTIFIER_NAME
-    String notifierUrl = AirbrakeNotifier.NOTIFIER_URL
-    String notifierVersion = AirbrakeNotifier.NOTIFIER_VERSION
-    String env = Environment.current.name
+
+    def env = Environment.current.name
     String apiKey
     List<String> paramsFilteredKeys = []
     List<String> sessionFilteredKeys = []
