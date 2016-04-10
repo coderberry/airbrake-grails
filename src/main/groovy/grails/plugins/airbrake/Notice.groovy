@@ -2,9 +2,9 @@ package grails.plugins.airbrake
 
 import groovy.transform.ToString
 import groovy.xml.MarkupBuilder
+import org.grails.exceptions.reporting.StackTraceFilterer
 import org.grails.web.servlet.mvc.GrailsWebRequest
 import org.springframework.web.context.request.RequestContextHolder
-import org.grails.exceptions.reporting.StackTraceFilterer
 
 @ToString(includeNames = true)
 class Notice {
@@ -154,7 +154,7 @@ class Notice {
         // Grails creates a really long error message for uncaught exceptions. Essentially a combination of all the webRequest meta data.
         // However it creates very unhelpful messages for airbrake so we just prefer the simpler message on the throwable
         // This means for exceptions logged by the app code like log.error(message, exception) that we ignore the supplied message.
-        // This is less than ideal (we expect the user supplied message to be useful) but by the time the Appender has the details we
+        // This is less than idea (we expect the user supplied message to be useful) but by the time the Appender has the details we
         // cannot distinguish between the caught and uncaught cases.
         this.errorMessage = throwable?.message ?: args.errorMessage
         this.hostname = args.hostname ?: InetAddress.localHost.hostName
@@ -250,31 +250,31 @@ class Notice {
      */
     Map toMap() {
         [
-            apiKey: apiKey,
-            projectRoot: projectRoot,
-            notifierName: notifierName,
-            notifierVersion: notifierVersion,
-            notifierUrl: notifierUrl,
-            paramsFilteredKeys: paramsFilteredKeys,
-            cgiDataFilteredKeys: cgiDataFilteredKeys,
-            sessionFilteredKeys: sessionFilteredKeys,
-            url: url,
-            component: component,
-            action: action,
-            params: params,
-            env: env,
-            cgiData: cgiData,
-            session: session,
-            backtrace: backtrace*.toMap().toArray(),
-            errorClass: errorClass,
-            errorMessage: errorMessage,
-            hostname: hostname,
-            user: user
+                apiKey: apiKey,
+                projectRoot: projectRoot,
+                notifierName: notifierName,
+                notifierVersion: notifierVersion,
+                notifierUrl: notifierUrl,
+                paramsFilteredKeys: paramsFilteredKeys,
+                cgiDataFilteredKeys: cgiDataFilteredKeys,
+                sessionFilteredKeys: sessionFilteredKeys,
+                url: url,
+                component: component,
+                action: action,
+                params: params,
+                env: env,
+                cgiData: cgiData,
+                session: session,
+                backtrace: backtrace*.toMap().toArray(),
+                errorClass: errorClass,
+                errorMessage: errorMessage,
+                hostname: hostname,
+                user: user
         ]
     }
 
-    private Backtrace[] parseBacktrace(backtrace) {
-        backtrace.collect { new Backtrace(it) }.toArray()
+    private grails.plugins.airbrake.Backtrace[] parseBacktrace(backtrace) {
+        backtrace.collect { new grails.plugins.airbrake.Backtrace(it) }.toArray()
     }
 
     private Map getArgsWithDefaults(args) {
@@ -325,7 +325,7 @@ class Notice {
 
     private applyFilters() {
         ['session', 'cgiData', 'params'].each {
-           setProperty(it, filterParameters(getProperty(it), getProperty("${it}FilteredKeys")) )
+            setProperty(it, filterParameters(getProperty(it), getProperty("${it}FilteredKeys")) )
         }
     }
 
