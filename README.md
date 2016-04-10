@@ -265,6 +265,8 @@ A backport to Grails 2.2 is available on the [grails-2.2 branch] (https://github
 
 ## Release Notes
 
+* 1.0.1 - 2016/04/11
+    * Support for Grails 3.1.4.
 * 1.0.0.RC1 - 2015/07/27
     * Support for Grails 3.0. #40
 * 0.9.4 - 2013/06/25

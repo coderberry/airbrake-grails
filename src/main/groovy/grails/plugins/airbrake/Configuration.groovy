@@ -3,6 +3,7 @@ package grails.plugins.airbrake
 import grails.util.Environment
 import org.grails.exceptions.reporting.DefaultStackTraceFilterer
 import org.grails.exceptions.reporting.StackTraceFilterer
+
 import javax.annotation.PreDestroy
 import java.util.concurrent.Executors
 import java.util.concurrent.ExecutorService
@@ -12,9 +13,9 @@ import java.util.regex.Pattern
 
 @Log4j
 class Configuration {
-    String notifierName = AirbrakeNotifier.NOTIFIER_NAME
-    String notifierUrl = AirbrakeNotifier.NOTIFIER_URL
-    String notifierVersion = AirbrakeNotifier.NOTIFIER_VERSION
+    String notifierName = grails.plugins.airbrake.AirbrakeNotifier.NOTIFIER_NAME
+    String notifierUrl = grails.plugins.airbrake.AirbrakeNotifier.NOTIFIER_URL
+    String notifierVersion = grails.plugins.airbrake.AirbrakeNotifier.NOTIFIER_VERSION
     String env = Environment.current.name
     String apiKey
     List<String> paramsFilteredKeys = []
@@ -22,8 +23,8 @@ class Configuration {
     List<String> cgiDataFilteredKeys = []
     boolean secure = false
     boolean enabled = true
-    String path = AirbrakeNotifier.AIRBRAKE_PATH
-    String host = AirbrakeNotifier.AIRBRAKE_HOST
+    String path = grails.plugins.airbrake.AirbrakeNotifier.AIRBRAKE_PATH
+    String host = grails.plugins.airbrake.AirbrakeNotifier.AIRBRAKE_HOST
     Integer port
     boolean includeEventsWithoutExceptions = false
     Closure async
@@ -35,7 +36,7 @@ class Configuration {
     Configuration(Map options = [:]) {
         configureDefaultAsyncClosure(options)
 
-        // re-implement the map constructor so we can set the port afterwards
+        // reimplement the map constructor so we can set the port afterwards
         options.each { k,v -> if (this.hasProperty(k)) { this."$k" = v} }
         port = port ?: (secure ? 443 : 80)
         if (!stackTraceFilterer) {
@@ -97,7 +98,7 @@ class Configuration {
     }
 
     // We used to have a single filteredKeys configuration parameter that was used for params, session and cgiData filtering
-    // Here we provide backwards compatibility for that old setting
+    // Here we provide backwards compatibilty for that old setting
     private handleLegacyFilteredKeys(Map options) {
         if (options.filteredKeys) {
             log.warn "Configuration option 'filteredKeys' is deprecated. Use 'paramsFilteredKeys', 'sessionFilteredKeys' or 'cgiDataFilteredKeys' instead."

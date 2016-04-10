@@ -11,14 +11,14 @@ class AirbrakeNotifier {
     def grailsApplication
 
     static final String AIRBRAKE_API_VERSION = '2.2'
-	static final String AIRBRAKE_HOST = 'airbrakeapp.com'
-	static final String AIRBRAKE_PATH = '/notifier_api/v2/notices'
+    static final String AIRBRAKE_HOST = 'airbrakeapp.com'
+    static final String AIRBRAKE_PATH = '/notifier_api/v2/notices'
 
-	static final String NOTIFIER_NAME = 'grails-airbrake'
-	static final String NOTIFIER_VERSION = '1.0'
-	static final String NOTIFIER_URL = 'https://github.com/cavneb/airbrake-grails'
+    static final String NOTIFIER_NAME = 'grails-airbrake'
+    static final String NOTIFIER_VERSION = '0.9.4'
+    static final String NOTIFIER_URL = 'https://github.com/cavneb/airbrake-grails'
 
-    final Configuration configuration
+    final grails.plugins.airbrake.Configuration configuration
 
     // mostly to make mocking easier in specs
     protected AirbrakeNotifier() {}
@@ -44,13 +44,13 @@ class AirbrakeNotifier {
         new Notice(configuration.merge(options))
     }
 
-	void sendNotice(Notice notice) {
+    void sendNotice(Notice notice) {
         if (configuration.async) {
             configuration.async(notice, grailsApplication)
         } else {
             sendToAirbrake(notice)
         }
-	}
+    }
 
     /**
      * Indicates whether <tt>throwable</tt> can be sent to Airbrake. It will not be eligible for sending if
