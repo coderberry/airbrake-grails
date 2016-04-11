@@ -3,6 +3,7 @@ package grails.plugins.airbrake
 import grails.util.Environment
 import org.grails.exceptions.reporting.DefaultStackTraceFilterer
 import org.grails.exceptions.reporting.StackTraceFilterer
+
 import javax.annotation.PreDestroy
 import java.util.concurrent.Executors
 import java.util.concurrent.ExecutorService
@@ -35,7 +36,7 @@ class Configuration {
     Configuration(Map options = [:]) {
         configureDefaultAsyncClosure(options)
 
-        // re-implement the map constructor so we can set the port afterwards
+        // reimplement the map constructor so we can set the port afterwards
         options.each { k,v -> if (this.hasProperty(k)) { this."$k" = v} }
         port = port ?: (secure ? 443 : 80)
         if (!stackTraceFilterer) {
@@ -97,7 +98,7 @@ class Configuration {
     }
 
     // We used to have a single filteredKeys configuration parameter that was used for params, session and cgiData filtering
-    // Here we provide backwards compatibility for that old setting
+    // Here we provide backwards compatibilty for that old setting
     private handleLegacyFilteredKeys(Map options) {
         if (options.filteredKeys) {
             log.warn "Configuration option 'filteredKeys' is deprecated. Use 'paramsFilteredKeys', 'sessionFilteredKeys' or 'cgiDataFilteredKeys' instead."

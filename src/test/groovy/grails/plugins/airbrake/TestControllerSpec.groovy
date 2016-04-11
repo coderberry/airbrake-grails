@@ -4,10 +4,10 @@ import grails.test.mixin.TestFor
 import spock.lang.Specification
 
 /**
- * See the API for {@link grails.test.mixin.services.ServiceUnitTestMixin} for usage instructions
+ * See the API for {@link grails.test.mixin.web.ControllerUnitTestMixin} for usage instructions
  */
-@TestFor(AirbrakeService)
-class AirbrakeServiceSpec extends Specification {
+@TestFor(TestController)
+class TestControllerSpec extends Specification {
 
     def setup() {
     }
