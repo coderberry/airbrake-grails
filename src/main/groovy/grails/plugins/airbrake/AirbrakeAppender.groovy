@@ -1,10 +1,10 @@
 package grails.plugins.airbrake
 
-import ch.qos.logback.classic.Level
-import ch.qos.logback.core.OutputStreamAppender
+import ch.qos.logback.core.AppenderBase
 
 
-class AirbrakeAppender<E> extends OutputStreamAppender<E> {
+
+class AirbrakeAppender<E> extends AppenderBase<E> {
 
     private boolean includeEventsWithoutExceptions
     private final AirbrakeNotifier notifier
@@ -16,7 +16,7 @@ class AirbrakeAppender<E> extends OutputStreamAppender<E> {
 
 
     @Override
-    protected void subAppend(E event) {
+    protected void append(E event) {
         if ((event?.throwableInformation || includeEventsWithoutExceptions) ) {
             notifier.notify(event.throwableInformation?.throwable, [errorMessage: event.message.toString()])
         }

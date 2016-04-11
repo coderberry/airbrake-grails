@@ -3,7 +3,6 @@ package grails.plugins.airbrake
 import grails.transaction.Transactional
 
 class AirbrakeService {
-    static transactional = false
 
     AirbrakeNotifier airbrakeNotifier
 

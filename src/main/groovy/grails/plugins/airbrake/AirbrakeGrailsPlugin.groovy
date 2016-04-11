@@ -1,9 +1,7 @@
 package grails.plugins.airbrake
 
-import ch.qos.logback.classic.Level
 import ch.qos.logback.classic.Logger
-import grails.plugins.*
-import grails.util.Holders as application
+import grails.plugins.Plugin
 import org.slf4j.LoggerFactory
 
 class AirbrakeGrailsPlugin extends Plugin {
@@ -67,7 +65,7 @@ class AirbrakeGrailsPlugin extends Plugin {
     void doWithApplicationContext() {
         def appender = applicationContext.airbrakeAppender
         Logger logger = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME)
-        logger.setLevel(Level.ERROR)
+        appender.start()
         logger.addAppender(appender)
     }
 

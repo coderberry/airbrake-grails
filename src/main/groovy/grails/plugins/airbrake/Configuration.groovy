@@ -13,9 +13,9 @@ import java.util.regex.Pattern
 
 @Log4j
 class Configuration {
-    String notifierName = grails.plugins.airbrake.AirbrakeNotifier.NOTIFIER_NAME
-    String notifierUrl = grails.plugins.airbrake.AirbrakeNotifier.NOTIFIER_URL
-    String notifierVersion = grails.plugins.airbrake.AirbrakeNotifier.NOTIFIER_VERSION
+    String notifierName = AirbrakeNotifier.NOTIFIER_NAME
+    String notifierUrl = AirbrakeNotifier.NOTIFIER_URL
+    String notifierVersion = AirbrakeNotifier.NOTIFIER_VERSION
     String env = Environment.current.name
     String apiKey
     List<String> paramsFilteredKeys = []
@@ -23,8 +23,8 @@ class Configuration {
     List<String> cgiDataFilteredKeys = []
     boolean secure = false
     boolean enabled = true
-    String path = grails.plugins.airbrake.AirbrakeNotifier.AIRBRAKE_PATH
-    String host = grails.plugins.airbrake.AirbrakeNotifier.AIRBRAKE_HOST
+    String path = AirbrakeNotifier.AIRBRAKE_PATH
+    String host = AirbrakeNotifier.AIRBRAKE_HOST
     Integer port
     boolean includeEventsWithoutExceptions = false
     Closure async

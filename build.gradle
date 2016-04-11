@@ -62,15 +62,13 @@ task wrapper(type: Wrapper) {
 }
 grailsPublish {
     // TODO: Provide values here
-    user = 'user'
-    key = 'key'
-    githubSlug = 'foo/bar'
+    user = 'marcatriflmedia'
+    key = 'b6c003edb42c236e2c27c27f13387079932582ba'
+    githubSlug = 'marcatriflmedia/maven'
     license {
         name = 'Apache-2.0'
     }
-    title = "My Plugin"
-    desc = "Full plugin description"
-    developers = [johndoe:"John Doe"]
-    portalUser = ""
-    portalPassword = ""    
+    title = "Airbrake-3.1"
+    desc = "Grails Airbrake plugin compatible with version 3.1.4 > *"
+    developers = [marcatriflmedia:"Marc-Emmanuel Ramage"]
 }

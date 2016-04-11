@@ -129,7 +129,7 @@ class Notice {
         def webRequest = (GrailsWebRequest) RequestContextHolder.requestAttributes
 
         this.args = args
-        this.throwable = filterStackTrace(args.throwable, args.stackTraceFilterer)
+        this.throwable = args.throwable//filterStackTrace(args.throwable, args.stackTraceFilterer)
         this.apiKey = args.apiKey
         this.projectRoot = args.projectRoot
 
@@ -168,7 +168,7 @@ class Notice {
     }
 
     void toXml(Writer writer) {
-        new MarkupBuilder(writer).notice(version: grails.plugins.airbrake.AirbrakeNotifier.AIRBRAKE_API_VERSION) {
+        new MarkupBuilder(writer).notice(version: AirbrakeNotifier.AIRBRAKE_API_VERSION) {
             'api-key'(apiKey)
 
             'notifier' {

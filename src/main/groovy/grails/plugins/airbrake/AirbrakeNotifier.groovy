@@ -77,7 +77,6 @@ class AirbrakeNotifier {
     }
 
     boolean sendToAirbrake(Notice notice) {
-
         if (!configuration.enabled) {
             return false
         }
@@ -92,7 +91,6 @@ class AirbrakeNotifier {
 
         try {
             conn = buildConnection()
-
             if (log.debugEnabled) {
                 log.debug "Sending notice data to ${conn.getURL()}"
 
