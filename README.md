@@ -1,4 +1,4 @@
-# Airbrake Plugin for Grails
+# Airbrake Plugin for Grails 3.1.4 > *
 
 This is the notifier plugin for integrating grails apps with [Airbrake](http://airbrake.io).
 
@@ -6,13 +6,20 @@ When an uncaught exception occurs, Airbrake will POST the relevant data to the A
 
 ## Installation & Configuration
 
-Add the following to your `BuildConfig.groovy`
+Add the following to your `build.gradle`
 
 ```
-compile ":airbrake:0.9.4"
+repositories {
+    ...
+    maven { url "http://dl.bintray.com/marcatriflmedia/plugins" }
+}
 ```
 
-Once the plugin is installed, you need to provide your Api Key in `Config.groovy` file:
+```
+compile "grails.plugins:airbrake-grails-3.1:1.0.2"
+```
+
+Once the plugin is installed, you need to provide your Api Key in `application.groovy` file:
 
 ```groovy
 grails.plugins.airbrake.apiKey = 'YOUR_API_KEY'
@@ -83,7 +90,7 @@ grails.plugins.airbrake.excludes
 ```
 
 ### Enabling/Disabling Notifications
-By default all errors are sent to Airbrake. However, you can disable error notifications (essentially disabling the plugin) by setting `grails.plugins.airbrake.enabled = false`. For example to disable error notificaitons in development and test environments you might have the following in `Config.groovy`:
+By default all errors are sent to Airbrake. However, you can disable error notifications (essentially disabling the plugin) by setting `grails.plugins.airbrake.enabled = false`. For example to disable error notificaitons in development and test environments you might have the following in `application.groovy`:
 
 ```groovy
 grails.plugins.airbrake.apiKey = 'YOUR_API_KEY'
@@ -128,7 +135,7 @@ grails.plugins.airbrake.env = grails.util.Environment.current.name[0..0] // Airb
 
 By default only uncaught errors or errors logged with an exception are reported to Airbrake. It is often convenient to loosen that restriction so that all messages logged at the `Error` level are reported to Airbrake. This often most useful in `src/java` or `src/groovy` classes that can more easily have a log4j logger than get accees to the dependency injected `airbrakeService`. 
 
-With the following line in `Config.groovy`:
+With the following line in `application.groovy`:
 
 ```groovy
 grails.plugins.airbrake.includeEventsWithoutExceptions = true
@@ -225,7 +232,7 @@ This configuration takes a closure with two parameters the `Notice` to send and 
 This plugin does not introduce a default choice for processing notices asynchronously. You should choose a method that suits your application.
 You could just create a new thread or use a scheduler/queuing plugin such as [Quartz](http://grails.org/plugin/quartz) or [Jesque](http://grails.org/plugin/jesque)
 
-For example if you are using the Quartz plugin you can send notifications asynchronously using the following setting in `Config.groovy`
+For example if you are using the Quartz plugin you can send notifications asynchronously using the following setting in `application.groovy`
 
 ```groovy
 grails.plugins.airbrake.async = { notice, grailsApplication ->
@@ -250,7 +257,7 @@ class AirbrakeNotifyJob {
 
 ### Stack Trace Filtering
 By default all stack traces are filtered using an instance of `org.codehaus.groovy.grails.exceptions.DefaultStackTraceFilterer` to remove common Grails and java packages.
-To provide custom stack trace filtering simple configure an instance of a class that implements the interface `org.codehaus.groovy.grails.exceptions.StackTraceFilterer` in `Config.groovy`
+To provide custom stack trace filtering simple configure an instance of a class that implements the interface `org.codehaus.groovy.grails.exceptions.StackTraceFilterer` in `application.groovy`
 
 ```groovy
 grails.plugins.airbrake.stackTraceFilterer = new MyCustomStackTraceFilterer()
@@ -265,6 +272,10 @@ A backport to Grails 2.2 is available on the [grails-2.2 branch] (https://github
 
 ## Release Notes
 
+* 1.0.2 - 2016/04/11
+    * Fix AirbrakeAppender for Grails 3.1.4.
+* 1.0.1 - 2016/04/11
+    * Support for Grails 3.1.4.
 * 1.0.0.RC1 - 2015/07/27
     * Support for Grails 3.0. #40
 * 0.9.4 - 2013/06/25

@@ -28,10 +28,10 @@ class Backtrace {
 
     Map toMap() {
         [
-            className: className,
-            methodName: methodName,
-            fileName: fileName,
-            lineNumber: lineNumber
+                className: className,
+                methodName: methodName,
+                fileName: fileName,
+                lineNumber: lineNumber
         ]
     }
 }
