@@ -2,6 +2,8 @@ package grails.plugins.airbrake
 
 import groovy.transform.ToString
 import groovy.xml.MarkupBuilder
+
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.codehaus.groovy.grails.web.servlet.mvc.GrailsWebRequest
 import org.springframework.web.context.request.RequestContextHolder
 import org.codehaus.groovy.grails.exceptions.StackTraceFilterer
@@ -149,7 +151,10 @@ class Notice {
         this.env = args.env
         this.cgiData = args.cgiData ?: getCgiDataFromRequest(webRequest)
         this.session = args.session ?: getSessionData(webRequest)
-        this.backtrace = parseBacktrace(throwable?.stackTrace ?: args.backtrace)
+		
+		def stacktraceList = throwable? (ExceptionUtils.getThrowableList(throwable).collect { it.stackTrace}.flatten()) :[]
+		
+        this.backtrace = parseBacktrace(throwable? stacktraceList : args.backtrace)
         this.errorClass = throwable?.class?.name ?: args.errorClass
         // Grails creates a really long error message for uncaught exceptions. Essentially a combination of all the webRequest meta data.
         // However it creates very unhelpful messages for airbrake so we just prefer the simpler message on the throwable
