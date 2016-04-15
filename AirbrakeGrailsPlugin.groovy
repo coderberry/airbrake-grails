@@ -5,9 +5,9 @@ import grails.plugins.airbrake.Configuration
 
 class AirbrakeGrailsPlugin {
     // the plugin version
-    def version = '0.9.4'
+    def version = '0.9.5'
     // the version or versions of Grails the plugin is designed for
-    def grailsVersion = "2.0.0 > *"
+    def grailsVersion = "2.4.5 > *"
     def pluginExcludes = [
             "grails-app/conf/**",
             "grails-app/views/**",
@@ -25,7 +25,7 @@ class AirbrakeGrailsPlugin {
 
     def license = "APACHE"
     def developers = [ [ name: "Phuong LeCong", email: "phuong@reteltechnologies.com" ], [ name: "Jon Palmer", email: "jpalmer@care.com" ],
-            [name:  'Donal Murtagh']]
+            [name:  'Donal Murtagh'],[name:  'Mario Meltzow', email: 'meltzow@invencom.de']]
 
     def issueManagement = [ system: "GitHub", url: "https://github.com/cavneb/airbrake-grails/issues" ]
     def scm = [ url: AirbrakeNotifier.NOTIFIER_URL ]
