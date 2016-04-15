@@ -6,4 +6,6 @@ out
 .idea
 .settings
 plugin.xml
-
+target-eclipse
+.project
+.classpath

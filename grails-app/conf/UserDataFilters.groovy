@@ -1,5 +1,3 @@
-package grails.plugins.airbrake.test
-
 class UserDataFilters {
     def airbrakeService
 
