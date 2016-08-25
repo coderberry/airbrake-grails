@@ -5,16 +5,20 @@ buildscript {
     repositories {
         mavenLocal()
         maven { url "https://repo.grails.org/grails/core" }
+		maven { url "https://plugins.gradle.org/m2/" }
+		jcenter()
     }
     dependencies {
         classpath "org.grails:grails-gradle-plugin:$grailsVersion"
+		classpath "io.spring.gradle:dependency-management-plugin:0.6.0.RELEASE"
+		classpath "com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7"
     }
 }
 
-plugins {
-    id "io.spring.dependency-management" version "0.5.2.RELEASE"
-    id "com.jfrog.bintray" version "1.2"
-}
+//plugins {
+//    id "io.spring.dependency-management" version "0.5.2.RELEASE"
+//    id "com.jfrog.bintray" version "1.2"
+//}
 
 version "1.0.0.RC1"
 group "org.grails.plugins"
@@ -26,9 +30,12 @@ apply plugin: 'idea'
 apply plugin: "spring-boot"
 apply plugin: "org.grails.grails-plugin"
 apply plugin: "org.grails.grails-gsp"
+apply plugin: "io.spring.dependency-management"
+apply plugin: "com.jfrog.bintray"
 // Used for publishing to central repository, remove if not needed
 apply from:'https://raw.githubusercontent.com/grails/grails-profile-repository/master/profiles/plugin/templates/grailsCentralPublishing.gradle'
 apply from:'https://raw.githubusercontent.com/grails/grails-profile-repository/master/profiles/plugin/templates/bintrayPublishing.gradle'
+
 
 ext {
     grailsVersion = project.grailsVersion
