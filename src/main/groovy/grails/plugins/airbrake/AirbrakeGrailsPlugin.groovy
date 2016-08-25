@@ -1,6 +1,8 @@
 package grails.plugins.airbrake
 
-import grails.plugins.Plugin
+import grails.plugins.*
+import groovy.lang.Closure;
+
 import org.slf4j.LoggerFactory;
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
@@ -33,18 +35,18 @@ class AirbrakeGrailsPlugin extends Plugin {
     def issueManagement = [ system: "GitHub", url: "https://github.com/cavneb/airbrake-grails/issues" ]
     def scm = [ url: AirbrakeNotifier.NOTIFIER_URL ]
 
-    def doWithSpring = {
-
+    Closure doWithSpring() { {->
+		def application = grailsApplication
         def configuration = new Configuration(application.config.grails.plugins.airbrake.clone())
-
+		
         airbrakeNotifier(AirbrakeNotifier, configuration) { bean ->
             bean.autowire = "byName"
         }
-
         airbrakeAppender(AirbrakeAppender, ref('airbrakeNotifier'), configuration.includeEventsWithoutExceptions)
+    	}
     }
 
-    def doWithApplicationContext = { applicationContext ->
+    void doWithApplicationContext() { 
         def appender = applicationContext.airbrakeAppender
 
         Logger rootLogger = (Logger)LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME)
