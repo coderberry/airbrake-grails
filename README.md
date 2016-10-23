@@ -6,13 +6,13 @@ When an uncaught exception occurs, Airbrake will POST the relevant data to the A
 
 ## Installation & Configuration
 
-Add the following to your `BuildConfig.groovy`
+Add the following dependency to your `build.gradle`
 
 ```
-compile ":airbrake:0.9.4"
+compile ":airbrake:1.0.0.RC1"
 ```
 
-Once the plugin is installed, you need to provide your Api Key in `Config.groovy` file:
+Once the plugin is installed, you need to provide your Api Key in `application.groovy` file:
 
 ```groovy
 grails.plugins.airbrake.apiKey = 'YOUR_API_KEY'
@@ -83,7 +83,7 @@ grails.plugins.airbrake.excludes
 ```
 
 ### Enabling/Disabling Notifications
-By default all errors are sent to Airbrake. However, you can disable error notifications (essentially disabling the plugin) by setting `grails.plugins.airbrake.enabled = false`. For example to disable error notificaitons in development and test environments you might have the following in `Config.groovy`:
+By default all errors are sent to Airbrake. However, you can disable error notifications (essentially disabling the plugin) by setting `grails.plugins.airbrake.enabled = false`. For example to disable error notificaitons in development and test environments you might have the following in `application.groovy`:
 
 ```groovy
 grails.plugins.airbrake.apiKey = 'YOUR_API_KEY'
@@ -137,7 +137,7 @@ grails.plugins.airbrake.includeEventsWithoutExceptions = true
 then logged errors get reported to Airbrake:
 
 ```groovy
-@Log4j
+@Sl4fj
 class SomeGroovyClass {
 	def doSomething() {
 		if (somethingWentWrong()) {
@@ -182,22 +182,23 @@ The supported keys are `id`, `name`, `email` and `username`
 airbrakeService.addNoticeContext(id: '1234', name: 'Bugs Bunny', email: 'bugs@acme.com', username: 'bugs')
 ```
 
-In most web apps the simplest way to provide this context is in a Grails filter. For example if you are using `SpringSecurity` add the following `AirbrakeFilter.groovy` in `grails-app/conf`
+In most web apps the simplest way to provide this context is in a Grails Interceptor. For example if you are using `SpringSecurity` add the following `AirbrakeInterceptor.groovy` in `grails-app/controllers/<appname>/AirbrakeInterceptor.groovy`
 ```groovy
-class AirbrakeFilters {
-    def airbrakeService
-    def springSecurityService
-
-    def filters = {
-        all(uri: '/**') {
-            before = {
-                def user = springSecurityService.currentUser
-                if (user) {
-                   airbrakeService.addNoticeContext(user: [id: user.id, name: user.name, email: user.email, username: user.username ])
-                }
-            }
-        }
+class AirbrakeInterceptor {
+  def airbrakeService
+  def springSecurityService
+  
+  AirbrakeInterceptor() {
+    matchAll()
+  }
+  
+  boolean before() {
+    def user = springSecurityService.currentUser
+    if (user) {
+        airbrakeService.addNoticeContext(user: [id: user.id, name: user.name, email: user.email, username: user.username ])
     }
+    true
+  }
 }
 ```
 
