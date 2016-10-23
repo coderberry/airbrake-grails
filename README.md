@@ -197,6 +197,7 @@ class AirbrakeInterceptor {
     if (user) {
         airbrakeService.addNoticeContext(user: [id: user.id, name: user.name, email: user.email, username: user.username ])
     }
+    true
   }
 }
 ```
